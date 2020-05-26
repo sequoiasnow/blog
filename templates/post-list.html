@@ -1,0 +1,13 @@
+<div class="postlist$if(category)$$category$$endif$">
+  $for(posts)$
+  <a class="postlist__title" href="$url$">$title$</a>
+    <div class="postlist__date">
+      <time>$date$</time>
+    </div>
+    <div class="postlist__tags">
+      $if(tags)$
+      $tags$
+      $endif$
+    </div>
+    $endfor$
+</div>

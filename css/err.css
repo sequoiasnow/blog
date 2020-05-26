@@ -1,0 +1,405 @@
+
+body
+{
+  margin           : 0 0 0 0;
+  padding          : 0 0 0 0;
+  background-color : #f9f7f4;
+  color            : #000000;
+  border-color     : #000000;
+  font-size        : 0.9rem;
+  font-family      : "IBM Plex Mono","Monaco","Fira Mono","Source Sans Serif", monospace;
+  font-weight      : 400;
+  line-height      : 1.618;
+}
+
+*
+{
+  -webkit-box-sizing : border-box;
+  -moz-box-sizing    : border-box;
+  -ms-box-sizing     : border-box;
+  -o-box-sizing      : border-box;
+  box-sizing         : border-box;
+  border-color       : #000000;
+}
+
+body.dark
+{
+  background-color : #1d1d1d;
+  color            : #ffffff;
+}
+
+.dark *
+{
+  border-color : #ffffff;
+}
+
+.dark-mode
+{
+  position         : absolute;
+  top              : 0;
+  right            : 0;
+  border           : solid 0px rgba(0,0,0,0.0);
+  padding          : 10px 10px 10px 10px;
+  margin           : 0 0 0 0;
+  cursor           : pointer;
+  background-color : #1d1d1d;
+  color            : #ffffff;
+}
+
+.dark .dark-mode
+{
+  background-color : #f9f7f4;
+  color            : #000000;
+}
+
+a
+{
+  text-decoration : none;
+  color           : #807fe0;
+}
+
+time
+{
+  font-family : "IBM Plex Mono","Monaco","Fira Mono","Source Sans Serif", monospace;
+  font-size   : 0.8rem;
+}
+
+h1,
+h2,
+h3,
+h3,
+h4
+{
+  font-family : "IBM Plex Mono","Monaco","Fira Mono","Source Sans Serif", monospace;
+  font-weight : 600;
+}
+
+h1
+{
+  font-size  : 1.69999rem;
+  text-align : center;
+}
+
+h2
+{
+  font-size : 1.5rem;
+}
+
+h3
+{
+  font-size : 1.19999rem;
+}
+
+hr
+{
+  width         : 100%;
+  border-top    : solid 1px inherit;
+  border-bottom : solid 0 #000000;
+  border-left   : solid 0 #000000;
+  border-right  : solid 0 #000000;
+  margin        : 1em 0 1em 0;
+}
+
+body
+{
+  display         : flex;
+  flex-direction  : column;
+  align-items     : center;
+  justify-content : space-between;
+}
+
+.wrapper
+{
+  max-width  : 960px;
+  min-height : 80vh;
+  margin-top : 1.69999rem;
+}
+
+@media all and (max-width: 666px)
+{
+.wrapper
+{
+  display        : flex;
+  flex-direction : column;
+  align-items    : flex-start;
+}
+
+}
+@media all and (min-width: 666px)
+{
+.wrapper
+{
+  display         : flex;
+  justify-content : center;
+}
+
+}
+.nav
+{
+  padding : 0px 0.59999em 0px 0.59999em;
+  margin  : 0px 0.5em 0px 0px;
+}
+
+.nav .nav__wrapper
+{
+  padding        : 5px 0px 5px 0px;
+  display        : flex;
+  flex-direction : column;
+}
+
+.nav nav > a
+{
+  margin             : 5px 0px 5px 0px;
+  -webkit-transition : all 0.2s ease 0.0s;
+  -moz-transition    : all 0.2s ease 0.0s;
+  -ms-transition     : all 0.2s ease 0.0s;
+  -o-transition      : all 0.2s ease 0.0s;
+  transition         : all 0.2s ease 0.0s;
+  text-decoration    : none;
+  color              : inherit;
+  font-family        : "IBM Plex Mono","Monaco","Fira Mono","Source Sans Serif", monospace;
+  font-weight        : 600;
+}
+
+.nav nav > a:hover
+{
+  color : #807fe0;
+}
+
+.nav .nav__tags,
+.nav .nav__links
+{
+  margin-top     : 0.5em;
+  display        : flex;
+  flex-direction : column;
+}
+
+.nav .nav__links
+{
+  border-bottom-style : dashed;
+  border-bottom-width : 1px;
+}
+
+.nav .nav__logo
+{
+  white-space : nowrap;
+}
+
+.nav .nav__logo a
+{
+  font-size           : 1.19999em;
+  border-bottom-style : solid;
+  border-bottom-width : 1px;
+}
+
+@media all and (max-width: 666px)
+{
+.nav
+{
+  border-bottom-style : solid;
+  border-bottom-width : 1px;
+  margin-bottom       : 1em;
+  width               : 100%;
+}
+
+}
+.content
+{
+  font-size   : 0.9rem;
+  font-family : "IBM Plex Mono","Monaco","Fira Mono","Source Sans Serif", monospace;
+  font-weight : 400;
+  line-height : 1.618;
+  max-width   : 960px;
+  width       : 100%;
+  padding     : 0px 0.59999em 0px 0.59999em;
+}
+
+.content pre
+{
+  padding : 1rem 1rem 1rem 1rem;
+}
+
+.post
+{
+  display        : flex;
+  flex-direction : column;
+  align-items    : center;
+}
+
+.post .post__header
+{
+  display        : flex;
+  flex-direction : column;
+  align-items    : center;
+}
+
+.post .post__title
+{
+  font-family : "IBM Plex Mono","Monaco","Fira Mono","Source Sans Serif", monospace;
+  font-weight : 600;
+  font-size   : 2em;
+  text-align  : center;
+}
+
+.post .post__body
+{
+  max-width : 640px;
+}
+
+.post .post__body > p:first-child::first-letter
+{
+  font-family   : "Times", serif;
+  float         : left;
+  font-size     : 70px;
+  line-height   : 50px;
+  margin-bottom : -4px;
+  padding       : 4px 8px 0px 0px;
+}
+
+.postlist
+{
+  display               : grid;
+  grid-template-columns : 10fr 5fr 6fr;
+  grid-gap              : 1em;
+}
+
+.postlist .postlist__date
+{
+  grid-column : 2;
+}
+
+.postlist .postlist__title
+{
+  grid-column : 1;
+}
+
+.postlist .postlist__tags
+{
+  grid-column : 3;
+}
+
+@media all and (max-width: 666px)
+{
+
+.postlist .postlist__tags
+{
+  display : none;
+}
+
+}
+.tag-cloud
+{
+  margin     : 0px auto 0px auto;
+  max-width  : 500px;
+  text-align : center;
+  font-size  : 3em;
+}
+
+.tag-cloud a
+{
+  font-family     : "IBM Plex Mono","Monaco","Fira Mono","Source Sans Serif", monospace;
+  font-weight     : 600;
+  text-decoration : none;
+  text-transform  : uppercase;
+  line-height     : 1;
+}
+
+.page-footer
+{
+  padding        : 1em 1em 1em 1em;
+  margin         : 0 0.5em 0 0.5em;
+  display        : flex;
+  flex-direction : column;
+  align-items    : center;
+  font-size      : 0.9rem;
+  font-family    : "IBM Plex Mono","Monaco","Fira Mono","Source Sans Serif", monospace;
+  font-weight    : 400;
+  line-height    : 1.618;
+}
+
+.page-footer .page-footer__wrapper
+{
+  max-width  : 640px;
+  width      : 100%;
+  text-align : center;
+}
+
+.tag
+{
+  font-family     : "IBM Plex Mono","Monaco","Fira Mono","Source Sans Serif", monospace;
+  font-weight     : 600;
+  font-size       : 0.9rem;
+  text-transform  : uppercase;
+  text-decoration : none;
+  margin-right    : 14px;
+  display         : inline-block;
+}
+
+
+.tag:not(.tag--icon)::before
+{
+  content          : "";
+  background-image : url("/images/icons/tag.svg");
+  background-size  : cover;
+  display          : inline-block;
+  width            : 0.8rem;
+  height           : 0.9rem;
+  padding-right    : 3px;
+  margin-bottom    : -2px;
+}
+
+.tag--icon img
+{
+  -webkit-filter : invert(100%) url(#tag-color-filter);
+  -moz-filter    : invert(100%) url(#tag-color-filter);
+  -ms-filter     : invert(100%) url(#tag-color-filter);
+  -o-filter      : invert(100%) url(#tag-color-filter);
+  filter         : invert(100%) url(#tag-color-filter);
+}
+
+.dark .tag--icon img
+{
+  -webkit-filter : url(#tag-color-filter);
+  -moz-filter    : url(#tag-color-filter);
+  -ms-filter     : url(#tag-color-filter);
+  -o-filter      : url(#tag-color-filter);
+  filter         : url(#tag-color-filter);
+}
+
+.dark .tag:not(.tag--icon)::before
+{
+  -webkit-filter : invert(100%);
+  -moz-filter    : invert(100%);
+  -ms-filter     : invert(100%);
+  -o-filter      : invert(100%);
+  filter         : invert(100%);
+}
+
+.dark .tag--icon
+{
+  -webkit-filter : invert(100%);
+  -moz-filter    : invert(100%);
+  -ms-filter     : invert(100%);
+  -o-filter      : invert(100%);
+  filter         : invert(100%);
+}
+
+.post__title .tag
+{
+  font-size : 4rem;
+}
+
+
+.post__title .tag:not(.tag--icon)::before
+{
+  width  : 3rem;
+  height : 3rem;
+}
+
+.post__title .tag img
+{
+  width : 6rem;
+}
+
+
+/* Generated with Clay, http://fvisser.nl/clay */
