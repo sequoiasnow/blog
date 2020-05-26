@@ -90,11 +90,12 @@ blogStylesheet =
 
 -- Color Pallet
 
-bgColor, txtColor, emphColor, tagColor :: Color
+bgColor, txtColor, emphColor, emphColor2, tagColor :: Color
 
 bgColor      = "#f9f7f4"
 txtColor     = "#000"
 emphColor    = "#807FE0"
+emphColor2   = "#FF5257"
 tagColor     = emphColor
 
 bgColorDark  = "#1D1D1D"
@@ -128,6 +129,7 @@ textFont =
 
 headerFont =
   do fontFamily ["IBM Plex Mono", "Monaco", "Fira Mono", "Source Sans Serif"] [monospace]
+
      fontWeight (weight 600)
 
 titleFont =
@@ -220,15 +222,14 @@ navStyle :: Css
 navStyle =
   do -- Set the general styling of the header.
      sym2 padding    0 (em 0.6)
-     margin          0 (em 0.5) 0 0
-
+     marginRight     (em 0.5)
 
      ".nav__wrapper" ?
        do sym2 padding    (px 5) (px 0)
           display         flex
           flexDirection   column
 
-     nav |> a ?
+     a ?
        do sym2 margin    (px 5) 0
           transition     "all" (sec 0.2) ease (sec 0)
           textDecoration none
@@ -249,12 +250,12 @@ navStyle =
 
      ".nav__logo" ?
        do whiteSpace        nowrap
+          borderBottomStyle solid
+          borderBottomWidth (px 1)
+          fontSize          (em 1.8)
 
-          a ?
-            do fontSize       (em 1.2)
-               borderBottomStyle solid
-               borderBottomWidth (px 1)
-
+          ".factorial" ?
+            do color  emphColor2
 
      query all [M.maxWidth $ px 666] $
        do borderBottomStyle solid
@@ -271,7 +272,7 @@ contentStyle =
      textFont
      maxWidth        siteWidth
      width           (pct 100)
-     sym2 padding    0 (em 0.6)
+     sym2 padding    (em 0.2) (em 0.6)
 
      --Style our code blocks with some line numbers and themes.
      pre ?
