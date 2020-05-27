@@ -92,6 +92,8 @@ main = hakyll $ do
           >>= loadAndApplyTemplate "templates/tag.html" ctx
           >>= loadAndApplyTemplate "templates/default.html" ctx
           >>= relativizeUrls
+          >>= cleanIndexUrls
+
 
   -- Compiles Categories
 
@@ -125,6 +127,7 @@ main = hakyll $ do
     compile $ pandocCompiler
         >>= loadAndApplyTemplate "templates/default.html" defaultContext
         >>= relativizeUrls
+        >>= cleanIndexUrls
 
   -- Copy posts
   match "posts/*" $ do
@@ -134,6 +137,7 @@ main = hakyll $ do
         >>= loadAndApplyTemplate "templates/post.html"    postCtx
         >>= loadAndApplyTemplate "templates/default.html" postCtx
         >>= relativizeUrls
+        >>= cleanIndexUrls
 
   -- Create the Tags page
   create ["tags.html"] $ do
@@ -150,6 +154,7 @@ main = hakyll $ do
         >>= loadAndApplyTemplate "templates/tags.html" tagsCtx
         >>= loadAndApplyTemplate "templates/default.html" tagsCtx
         >>= relativizeUrls
+        >>= cleanIndexUrls
 
   match "index.html" $ do
     route idRoute
@@ -164,7 +169,7 @@ main = hakyll $ do
           >>= applyAsTemplate indexCtx
           >>= loadAndApplyTemplate "templates/default.html" indexCtx
           >>= relativizeUrls
---          >>= cleanIndexUrls
+          >>= cleanIndexUrls
 
   match "templates/*" $ compile templateBodyCompiler
 
