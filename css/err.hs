@@ -13,7 +13,6 @@ import           Prelude hiding (div, span, rem, (**), not, all, filter)
 import qualified Data.List as L
 
 
-
 -- Render the stylesheet to be copied by Hakyll to the static site.
 
 main :: IO ()
@@ -48,7 +47,25 @@ blogStylesheet =
 
     ".dark" ** star ?
       do borderColor     txtColorDark
+
+    -- Overrides for print
+    query M.print [] $
+      do -- Force light mode
+         "body.dark" ?
+           do backgroundColor bgColor
+              color           txtColor
+              borderColor     txtColor
+
+         ".dark" ** star ?
+           do borderColor    txtColor
+
+         -- Set the correct width for the paper
+         body <> html ?
+           do backgroundColor white
+              width           (px 960)
+
     -- The Dark Mode Switch
+
     darkModeButtonStyle
 
     -- Common styles for standard html elements
@@ -76,7 +93,7 @@ blogStylesheet =
     -- Common styles for various areas spects of the site. In general these
     -- consist of a navigation bar, varying page content, and a footer.
 
-    ".nav"         ? navStyle
+    nav            ? navStyle
     ".content"     ? contentStyle
     ".post"        ? postStyle
     ".postlist"    ? postlistStyle
@@ -92,7 +109,7 @@ blogStylesheet =
 
 bgColor, txtColor, emphColor, emphColor2, tagColor :: Color
 
-bgColor      = "#f9f7f4"
+bgColor      = lighten 1 "#f9f7f4"
 txtColor     = "#000"
 emphColor    = "#807FE0"
 emphColor2   = "#FF5257"
@@ -118,35 +135,36 @@ offColors = L.reverse
 
 -- Font styles
 
-textFont, headerFont, codeFont, titleFont :: Css
+textFont, headerFont, codeFont, titleFont, altFont :: Css
 
 textFont =
   do fontSize    (rem 0.9)
-    --  fontFamily  ["Libre Baskerville", "Georgia", "Times New Roman"] [serif]
-     fontFamily ["IBM Plex Mono", "Monaco", "Fira Mono", "Source Sans Serif"] [monospace]
+     fontFamily  ["Courier Prime", "Monaco", "-apple-system"] [monospace]
      fontWeight  (weight 400)
      lineHeight  (unitless 1.618)
 
-headerFont =
-  do fontFamily ["IBM Plex Mono", "Monaco", "Fira Mono", "Source Sans Serif"] [monospace]
+altFont = textFont >> fontStyle italic
 
-     fontWeight (weight 600)
+headerFont =
+  do fontFamily  ["IBM Plex Mono", "Monaco", "-apple-system"] [monospace]
+     fontWeight (weight 700)
 
 titleFont =
   do headerFont
      fontSize   (em 2)
 
 codeFont =
-  do fontFamily ["IBM Plex Mono", "Monaco", "Fira Mono", "Source Sans Serif"] [monospace]
+  do fontFamily ["Monaco", "Fira Mono", "Source Sans Serif"] [monospace]
 
 --------------------------------------------------------------------------------
 
 -- Layout constraints for the site.
 
-siteWidth, postWidth :: Size LengthUnit
+siteWidth, postWidth, contentWidth :: Size LengthUnit
 
-siteWidth = px 960
-postWidth = px 640
+siteWidth    = px 960
+postWidth    = px 640
+contentWidth = px 720
 
 
 --------------------------------------------------------------------------------
@@ -208,12 +226,55 @@ commonStyles =
       fontSize  (rem 1.2)
 
     hr ?
-      do width           (pct 100)
+      do width           (pct 90)
+         maxWidth        (vw 90)
          borderTop       solid (px 1) inherit
          borderBottom    solid nil black
          borderLeft      solid nil black
          borderRight     solid nil black
          sym2 margin     (em 1) nil
+
+    -- Center figures, with descriptive text intentionally separated.
+
+    figure ?
+      do display          flex
+         flexDirection    column
+         alignItems       center
+         maxWidth         (vw 100)
+         sym2 margin      (em 1) auto
+
+         img ?
+           sym margin (px 10)
+
+         figcaption ?
+           do sym2 margin    (rem 0.3) (em 4)
+              textAlign       end
+              width           (pct 70)
+              borderTopStyle  solid
+              borderTopWidth  (px 1)
+              altFont
+
+    -- Modern looking blockquotes, with the classic left bar and margin
+    blockquote ?
+      do sym2 margin    (em 2) (em 3)
+         altFont
+         fontStyle      italic
+         maxWidth       (vw 100)
+
+
+    --Style our code blocks with some line numbers and themes.
+    pre ?
+      do sym padding    (rem 1)
+         codeFont
+         maxWidth       (vw 100)
+         width          (pct 100)
+         whiteSpace     preWrap
+         wordBreak      breakAll
+
+         -- Default font style is light
+         doomSolarized
+
+    ".dark" ** pre ? doomChallengerDeep
 
 
 --------------------------------------------------------------------------------
@@ -224,10 +285,26 @@ navStyle =
      sym2 padding    0 (em 0.6)
      marginRight     (em 0.5)
 
-     ".nav__wrapper" ?
-       do sym2 padding    (px 5) (px 0)
+     ul ?
+       do paddingLeft     nil
+          marginTop       nil
           display         flex
           flexDirection   column
+          listStyleType   none
+
+
+     ".nav__title" ?
+       do whiteSpace        nowrap
+          borderBottomStyle solid
+          borderBottomWidth (px 1)
+          fontSize          (em 1.8)
+
+          ".factorial" ?
+            do color  emphColor2
+
+     ".nav__pages" ?
+       do borderBottomStyle  dashed
+          borderBottomWidth  (px 1)
 
      a ?
        do sym2 margin    (px 5) 0
@@ -239,29 +316,19 @@ navStyle =
           hover &
             color        emphColor
 
-     ".nav__tags" <> ".nav__links" ?
-       do marginTop     (em 0.5)
-          display       flex
-          flexDirection column
+     ".nav__tags" <> ".nav__pages" ?
+       do marginTop      (em 0.5)
+          paddingBottom  (em 0.5)
 
-     ".nav__links" ?
-       do borderBottomStyle dashed
-          borderBottomWidth (px 1)
-
-     ".nav__logo" ?
-       do whiteSpace        nowrap
-          borderBottomStyle solid
-          borderBottomWidth (px 1)
-          fontSize          (em 1.8)
-
-          ".factorial" ?
-            do color  emphColor2
 
      query all [M.maxWidth $ px 666] $
        do borderBottomStyle solid
           borderBottomWidth (px 1)
           marginBottom      (em 1)
           width             (pct 100)
+
+     -- Kill the navigation for print
+     query M.print [] $ display none
 
 
 --------------------------------------------------------------------------------
@@ -270,13 +337,11 @@ contentStyle :: Css
 contentStyle =
   do -- Set common styles to the display of a post.
      textFont
-     maxWidth        siteWidth
+     maxWidth        contentWidth
      width           (pct 100)
      sym2 padding    (em 0.2) (em 0.6)
 
-     --Style our code blocks with some line numbers and themes.
-     pre ?
-       sym padding    (rem 1)
+
 
 --------------------------------------------------------------------------------
 
@@ -289,10 +354,14 @@ postStyle =
 
      ".post__title" ?
        do titleFont
-          textAlign center
+          textAlign     center
+          marginBottom  (em 0.5)
 
      ".post__body" ?
        do maxWidth         postWidth
+
+     ".post__tags" ?
+       do marginBottom  (em 1.5)
 
      ".post__body" |> p # firstChild # firstLetter?
        do -- Create a drop-cap effect
@@ -302,6 +371,7 @@ postStyle =
           lineHeight    (px 50)
           marginBottom  (px $ -4)
           padding       (px 4) (px 8) (px 0) (px 0)
+
 
 --------------------------------------------------------------------------------
 
@@ -324,7 +394,9 @@ postlistStyle =
 
      -- Remove tags on small screens
      query all [M.maxWidth $ px 666] $
-       do ".postlist__tags" ?
+       do "grid-template-columns"     -: "10fr 5fr"
+
+          ".postlist__tags" ?
             do display  none
 
 --------------------------------------------------------------------------------
@@ -370,14 +442,14 @@ tagStyle =
      -- Enlarge a tag in a title.
 
      ".post__title .tag" ?
-       do fontSize        (rem 4)
+       do fontSize        (rem 2)
 
           not ".tag--icon" & before &
-            do width (rem 3)
-               height (rem 3)
+            do width   (rem 1.7)
+               height  (rem 1.7)
 
           img ?
-            do width (rem 6)
+            do width (rem 3)
 
 --------------------------------------------------------------------------------
 
@@ -398,9 +470,11 @@ tagcloudStyle = do
 
 pageFooterStyle :: Css
 pageFooterStyle =
-  do sym padding      (em 1)
+  do sym2 padding     (em 0.2) (em 2)
      sym2 margin      nil (em 0.5)
      centerColumn
+     borderTopStyle   solid
+     borderTopWidth   (px 1)
      textFont
 
      ".page-footer__wrapper" ?
@@ -426,8 +500,89 @@ darkModeButtonStyle =
           backgroundColor      bgColorDark
           color                txtColorDark
 
+          -- Hide on print
+          query M.print [] $ display none
+
 
      -- Allow for dark mode
      ".dark" ** ".dark-mode" ?
        do backgroundColor      bgColor
           color                txtColor
+
+--------------------------------------------------------------------------------
+
+-- Color Schemes
+
+doomChallengerDeep :: Css
+doomChallengerDeep = do
+  -- background
+  backgroundColor  "#1E1C31"
+  color            "#CBE3E7"
+
+  ".al" ? color "#FF8080" -- Alert
+  ".an" ? color "#65B2FF" -- Annotation
+  ".at" ? color "#91DDFF" -- Attribute
+  ".bn" ? color "#CBE3E7" -- BaseN
+  ".bu" ? color "#C991E1" -- BuiltIn
+  ".cf" ? color "#91DDFF" -- ControlFlow
+  ".ch" ? color "#FFE9AA" -- Char
+  ".cn" ? color "#FFE9AA" -- Constant
+  ".co" ? color "#65B2FF" -- Comment
+  ".cv" ? color "#565575" -- CommentVar
+  ".do" ? color (darken 30 "#62D196") -- Documentation
+  ".dt" ? color "#FF8080" -- DataType
+  ".dv" ? color "#FFE9AA" -- DecVal
+  ".er" ? color "#FF8080" -- Error
+  ".ex" ? color "#C991E1" -- Extension
+  ".fl" ? color "#FFB378" -- Float
+  ".fu" ? color "#C991E1" -- Function
+  ".im" ? color "#FF8080" -- Import
+  ".in" ? color "#CBE3E7" -- Information
+  ".kw" ? color "#FF8080" -- Keyword
+  ".op" ? color "#63F2F1" -- Operator
+  ".ot" ? color "#CBE3E7" -- Other
+  ".pp" ? color "#63F2F1" -- Preprocessor
+  ".re" ? color "#906CFF" -- RegionMarker
+  ".sc" ? color "#FFE9AA" -- SpecialCharacter
+  ".ss" ? color "#FFE9AA" -- SpecialString
+  ".st" ? color "#FFE9AA" -- String
+  ".va" ? color "#FFE9AA" -- Variable
+  ".vs" ? color "#FFE9AA" -- VerbatimString
+  ".wa" ? color "#FFE9AA" -- Warning
+
+doomSolarized :: Css
+doomSolarized = do
+  -- background
+  backgroundColor  "#FDF6E3"
+  color            "#556b72"
+
+  ".al" ? color "#dc322f" -- Alert
+  ".an" ? color "#b58900" -- Annotation
+  ".at" ? color "#2aa198" -- Attribute
+  ".bn" ? color "#6c71c4" -- BaseN
+  ".bu" ? color "#859900" -- BuiltIn
+  ".cf" ? color "#FCF8ED" -- ControlFlow
+  ".ch" ? color "#2aa198" -- Char
+  ".cn" ? color "#6c71c4" -- Constant
+  ".co" ? color "#96A7A9" -- Comment
+  ".cv" ? color "#788484" -- CommentVar
+  ".do" ? color (lighten 20 "#35a69c") -- Documentation
+  ".dt" ? color "#859900" -- DataType
+  ".dv" ? color "#859900" -- DecVal
+  ".er" ? color "#dc322f" -- Error
+  ".ex" ? color "#FCF8ED" -- Extension
+  ".fl" ? color "#6c71c4" -- Float
+  ".fu" ? color "#d33682" -- Function
+  ".im" ? color "#268bd2" -- Import
+  ".in" ? color "#96A7A9" -- Information
+  ".kw" ? color "#859900" -- Keyword
+  ".op" ? color "#268bd2" -- Operator
+  ".ot" ? color "#b58900" -- Other
+  ".pp" ? color "#268bd2" >> fontWeight bold -- Preprocessor
+  ".re" ? color  (darken 20 "#FFFBEA") -- RegionMarker
+  ".sc" ? color "#FFE9AA" -- SpecialCharacter
+  ".ss" ? color "#b58900" -- SpecialString
+  ".st" ? color "#2aa198" -- String
+  ".va" ? color "#268bd2" -- Variable
+  ".vs" ? color "#6c71c4" -- VerbatimString
+  ".wa" ? color "#b58900" -- Warning
