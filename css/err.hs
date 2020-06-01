@@ -586,7 +586,7 @@ doomSolarized = do
   ".co" ? color "#96A7A9" -- Comment
   ".cv" ? color "#788484" -- CommentVar
   ".do" ? color (lighten 20 "#35a69c") -- Documentation
-  ".dt" ? color "#859900" -- DataType
+  ".dt" ? color "#B58900" -- DataType
   ".dv" ? color "#859900" -- DecVal
   ".er" ? color "#dc322f" -- Error
   ".ex" ? color "#FCF8ED" -- Extension

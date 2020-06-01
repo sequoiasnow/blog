@@ -10,5 +10,7 @@ executable site
                   , blaze-html
                   , clay
                   , filepath
+                  , containers
+                  , pandoc
   ghc-options:      -threaded
   default-language: Haskell2010

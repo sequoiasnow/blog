@@ -7,6 +7,8 @@ import qualified Text.Blaze.Html5                as H
 import qualified Text.Blaze.Html5.Attributes     as A
 import           Text.Blaze.Html.Renderer.String (renderHtml)
 import           System.FilePath.Posix  (takeBaseName,takeDirectory,(</>))
+import qualified Data.Set as S
+import           Text.Pandoc.Options
 
 --------------------------------------------------------------------------------
 
@@ -124,7 +126,7 @@ main = hakyll $ do
   -- Create an about/contact page
   match (fromList ["about.md", "contact.markdown"]) $ do
     route   $ cleanRoute
-    compile $ pandocCompiler
+    compile $ pandocMathCompiler
         >>= loadAndApplyTemplate "templates/default.html" defaultContext
         >>= relativizeUrls
         >>= cleanIndexUrls
@@ -132,7 +134,7 @@ main = hakyll $ do
   -- Copy posts
   match "posts/*" $ do
     route cleanRoute
-    compile $ pandocCompiler
+    compile $ pandocMathCompiler
         >>= saveSnapshot "content" -- allows us to pull teasers
         >>= loadAndApplyTemplate "templates/post.html"    postCtx
         >>= loadAndApplyTemplate "templates/default.html" postCtx
@@ -175,3 +177,20 @@ main = hakyll $ do
 
 
 --------------------------------------------------------------------------------
+
+pandocMathCompiler :: Compiler (Item String)
+pandocMathCompiler =
+  let
+    mathExtensions =
+      [ Ext_tex_math_dollars
+      , Ext_tex_math_double_backslash
+      , Ext_latex_macros
+      ]
+    defaultExtensions = writerExtensions defaultHakyllWriterOptions
+    newExtensions = foldr enableExtension defaultExtensions mathExtensions
+    writerOptions =
+      defaultHakyllWriterOptions
+      { writerExtensions = newExtensions
+      , writerHTMLMathMethod = MathJax ""
+      }
+  in pandocCompilerWith defaultHakyllReaderOptions writerOptions
