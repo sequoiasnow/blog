@@ -263,6 +263,7 @@ commonStyles =
 
 
     --Style our code blocks with some line numbers and themes.
+
     pre ?
       do sym padding    (rem 1)
          codeFont
@@ -275,6 +276,13 @@ commonStyles =
          doomSolarized
 
     ".dark" ** pre ? doomChallengerDeep
+
+    -- Handle printing
+    query M.print [] $ pre ?
+      do doomSolarized
+         backgroundColor    transparent
+         filter             (grayscale $ pct 50)
+
 
 
 --------------------------------------------------------------------------------
