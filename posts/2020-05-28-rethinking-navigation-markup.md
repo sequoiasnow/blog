@@ -37,12 +37,10 @@ Now, in my initial attempt I wrote this as follow:
 </header>
 ```
 
-Clearly there are a few problems with this, but its easy to get lost in this
-type of convoluted structure when iterating over designs. Still, while its nice
-to get a rapid prototype sometimes, that's no excuse for leaving behind crappy
-code - especially when it hampers accessibility as in this case. So, how would
-we fix this?
-
+There are some clear problems with this that I failed to notice while iterating
+over designs. Sometimes it's easy to become so focused on rapidly prototyping
+new styles that common quality control gets left behind. Still, it's never to
+late to return and fix up some glaring errors. Let's look at some of them.
 
 ## Using `nav` Correctly
 
@@ -87,14 +85,14 @@ wrapping our links in a list:
 </nav>
 ```
 
-Note that the rapper div around the title link is no longer an anomaly, but
-properly fits in with the semantics of the remainder of the list.
+Note that the wrapper div around the title link is no longer an anomaly, but
+fits in properly with the semantics of the remainder of the list.
 
 Moreover, though the above code is actually more nested than the original, its
 now very clear what's going on. In fact we could add titles to our sections if
 they every grew to large, or add new ones as need be without having to write
-additional html. Indeed, the class names remain only to differentiate borders
-and text size and could be made superfluous if we changed from the BEM naming convention.
+additional css. The class names remain only to differentiate borders and text
+size and could be made superfluous if we changed from the BEM naming convention.
 
 ## Superfluous Wrappers
 
@@ -102,11 +100,9 @@ Really there's no need for the `<div class="nav__wrapper"> ... </div>` element,
 since our navigation makes absolutely no use of it. Granted, there are times
 when wrapping elements are a necessity, but these cases are astoundingly rare,
 usually being equivalent to some margin / grid specification. So, away with the
-unneeded `div`.
-
-The same goes for the `header` element, which itself serves only to confuse the
-situation as we have not the placed the `nav` element in an `article`. Hence we
-are left only with the abbreviated code above.
+unneeded `div`. The same goes for the `header` element, which itself serves only
+to confuse the situation as we have not the placed the `nav` element in an
+`article`. Hence we are left only with the abbreviated code above.
 
 ## Conclusion
 
@@ -116,7 +112,7 @@ done this on a multitude of occasions, and I can say with certainty that fixing
 a problem when its spotted rather than assigning it to a todo list always leads
 to a better maintained project and saves a massive headache in the future.
 
-Keeping that in mind, what have we really accomplished?
+Keeping that in mind, what have we accomplished?
 
 - The navigation element has eliminated superfluous wrappers which could confuse
   future styling
