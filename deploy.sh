@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Check that we aren't current running the website
+
+
+if [[ $(ps aux | grep stack | wc -l) -ge 2 ]]; then
+    echo "Please terminate the locally running site before proceeding!"
+    exit 1
+fi
+
 # SOURCE:
 # https://jaspervdj.be/hakyll/tutorials/github-pages-tutorial.html
 
