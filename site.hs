@@ -12,6 +12,11 @@ import           Text.Pandoc.Options
 
 --------------------------------------------------------------------------------
 
+root :: String
+root = "https://thoughtsfactorial.com"
+
+--------------------------------------------------------------------------------
+
 -- A list of tags to be rendered as icons
 tagIcons :: [(String, String)]
 tagIcons =
@@ -77,6 +82,7 @@ main = hakyll $ do
                 tagsField "nav_categories" categories                   <>
                 dateField "date" "%B %e, %Y"                            <>
                 teaserField "teaser" "content"                          <>
+                constField "root" root                                  <>
                 defaultContext
 
   -- Compiles a tags page, in homage to the archive page.
@@ -157,6 +163,21 @@ main = hakyll $ do
         >>= loadAndApplyTemplate "templates/default.html" tagsCtx
         >>= relativizeUrls
         >>= cleanIndexUrls
+
+  -- Create a sitemap
+  create ["sitemap.xml"] $ do
+    route idRoute
+    compile $ do
+      posts <- recentFirst =<< loadAll "posts/*"
+      singlePages <- loadAll (fromList ["about.md", "contact.markdown"])
+      let pages = posts <> singlePages
+          sitemapCtx =
+              constField "root" root                    <>
+              listField "pages" postCtx (return pages)
+      makeItem ""
+          >>= loadAndApplyTemplate "templates/sitemap.xml" sitemapCtx
+          >>= relativizeUrls
+          >>= cleanIndexUrls
 
   match "index.html" $ do
     route idRoute
