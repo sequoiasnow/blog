@@ -283,6 +283,17 @@ commonStyles =
          backgroundColor    transparent
          filter             (grayscale $ pct 50)
 
+    -- Some simple classes for writing posts
+    ".center" ?
+      do display         flex
+         flexDirection   column
+         justifyContent  center
+
+    ".Huge-text" ?
+      do fontSize (em 3)
+         textAlign center
+
+
 
 
 --------------------------------------------------------------------------------

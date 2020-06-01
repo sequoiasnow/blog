@@ -2,17 +2,22 @@
 title: About
 ---
 
-ullam imperdiet sodales orci vitae molestie. Nunc quam orci, pharetra a
-rhoncus vitae, eleifend id felis. Suspendisse potenti. Etiam vitae urna orci.
-Quisque pellentesque dignissim felis, egestas tempus urna luctus vitae. In hac
-habitasse platea dictumst. Morbi fringilla mattis odio, et mattis tellus
-accumsan vitae.
+<div class="center Huge-text">
+$$
+\text{Thoughts}! = \prod  \text{idea}
+$$
+</div>
 
-1. Amamus Unicode 碁
-2. Interdum nex magna.
+Thoughts! is a simple blog that serves as a space to express the errant thoughts
+of Sequoia Snow. All the thoughts and opinions expressed herein are my own,
+though I hope that some of them may serve to motivate thoughts in others. After
+all, I can't very well call the blog *Thoughts Factorial* without expressing
+some kind of multiplicative growth.
 
-Vivamus eget mauris sit amet nulla laoreet lobortis. Nulla in diam elementum
-risus convallis commodo. Cras vehicula varius dui vitae facilisis. Proin
-elementum libero eget leo aliquet quis euismod orci vestibulum. Duis rhoncus
-lorem consequat tellus vestibulum aliquam. Quisque orci orci, malesuada porta
-blandit et, interdum nec magna.
+Within this blog you'll find articles ranging form philosophy, math, and
+programming to errant thoughts about the weather - all organized by date
+alone. Search through them at your leisure.
+
+> Ideally a book would have no order to it, and the reader would have to
+> discover his own.
+> - Mark Twain
