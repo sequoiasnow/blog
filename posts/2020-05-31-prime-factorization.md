@@ -99,12 +99,13 @@ q_j$ then by cancellation $s / p_i = s/q_j$ would be a number $< s$ with
 distinct factorizations, which violates our assumption that $s$ is the smallest
 such number.
 
-Suppose without
-loss of generality that $q_1 > p_1$ (if not simply re-label that $q_i$ as $p_i$
-and vice versa). Then let
+Suppose without loss of generality that $q_1 > p_1$ (if not simply re-label that
+$q_i$ as $p_i$ and vice versa). Then let
+
 $$ t = (q_1 - p_1)q_2q_3\cdots q_m. $$
+
 Since $q_1 \neq p_1$ and $q_1 > p_1$, it's clear that $t > 0$. Moreover, since
-$(q_1 - p_1)  < q_1$, we see that $t < s$ and hence must have a *unique*
+$(q_1 - p_1) < q_1$, we see that $t < s$ and hence must have a *unique*
 factorization. Expanding,
 
 $$
