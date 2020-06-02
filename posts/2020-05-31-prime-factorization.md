@@ -45,6 +45,8 @@ induction, which I will remark upon briefly before proceeding.
 > gave a superior smile before replying, "What is the tortoise standing on?"
 > "You're very clever, young man, very clever," said the old lady. "But it's
 > turtles all the way down!"
+>
+> - Stephen Hawking, *A Brief History of Time*.
 
 
 The key to induction is somewhat opposite the turtle principal - it is simply
