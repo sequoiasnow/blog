@@ -293,6 +293,14 @@ commonStyles =
       do fontSize (em 3)
          textAlign center
 
+    -- Fix the overflow of math on mobile.
+
+    ".math.display" ?
+      do maxWidth       (vw 90)
+         width          (pct 100)
+         overflowX      auto
+         display        block
+
 
 
 
