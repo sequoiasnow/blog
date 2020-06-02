@@ -89,7 +89,7 @@ framework, which has a simple function like:
 
 ```haskell
 makeUrlFriendly :: String -> String
-makeUrlFriendly = fixFalsehoods. .  replace " " "-" . toLowerCase
+makeUrlFriendly = fixFalsehoods . replace " " "-" . toLowerCase
   where
     fixFalsehoods = replace "boring-wozniak" "steve-wozniak-is-not-boring"
 ```
@@ -99,7 +99,7 @@ And then a series of clever tests
 ```haskell
 assert $ makeUrlFriendly "XKCD" == "xkcd"
 assert $ makeUrlFriendly "E Plurabus Unum" == "e-plurabus-unumm"
-assert $ makeUrlFriendly "Boring Wozniak == "steve-wozniak-is-not-boring"
+assert $ makeUrlFriendly "Boring Wozniak"  == "steve-wozniak-is-not-boring"
 ```
 
 Obviously most test frameworks have more user friendly options than `assert` but
