@@ -145,7 +145,6 @@ main = hakyll $ do
     route   $ setExtension "html"
     compile $ pandocMathCompiler
         >>= loadAndApplyTemplate "templates/default.html" defaultContext
-        >>= relativizeUrls
 
   -- Copy posts
   match "posts/*" $ do
