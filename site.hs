@@ -87,8 +87,8 @@ main = hakyll $ do
 
   -- Compiles a tags page, in homage to the archive page.
   tagsRules tags $ \tag pat -> do
-    let title = maybe "Sorry, haven't heard of that tag yet!"
-                      renderHtml (renderTag tag Nothing)
+    let title = tag
+
     route cleanRoute
     compile $ do
       posts <- recentFirst =<< loadAll pat
