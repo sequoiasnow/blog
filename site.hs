@@ -1,5 +1,6 @@
 --------------------------------------------------------------------------------
 {-# LANGUAGE OverloadedStrings #-}
+
 import           Hakyll
 import           Text.Blaze.Html                 (toHtml, toValue, (!))
 import           Data.List              (sortBy,isSuffixOf)
@@ -87,12 +88,14 @@ main = hakyll $ do
 
   -- Compiles a tags page, in homage to the archive page.
   tagsRules tags $ \tag pat -> do
-    let title = tag
+    let title      = tag
+        titleHtml = maybe tag renderHtml (renderTag tag Nothing)
 
     route cleanRoute
     compile $ do
       posts <- recentFirst =<< loadAll pat
-      let ctx = constField "title" title <>
+      let ctx = constField "title" title                 <>
+                constField "title_html" titleHtml        <>
                 listField "posts" postCtx (return posts) <>
                 defaultContext
 
