@@ -99,6 +99,7 @@ blogStylesheet =
     ".postlist"    ? postlistStyle
     ".tag-cloud"   ? tagcloudStyle
     ".page-footer" ? pageFooterStyle
+    ".broken"      ? brokenStyle
 
     -- Styles for elements common to various areas
     tagStyle
@@ -301,9 +302,6 @@ commonStyles =
          overflowX      auto
          display        block
 
-
-
-
 --------------------------------------------------------------------------------
 
 navStyle :: Css
@@ -477,6 +475,18 @@ tagStyle =
 
           img ?
             do width (rem 3)
+
+--------------------------------------------------------------------------------
+
+brokenStyle :: Css
+brokenStyle = star ?
+  do "text-shadow" -: "2px 2px tomato, -3px -1px red"
+
+     -- Center any haiku's that might appear in our code...
+     blockquote ? textAlign center
+
+
+
 
 --------------------------------------------------------------------------------
 

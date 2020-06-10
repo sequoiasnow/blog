@@ -140,6 +140,13 @@ main = hakyll $ do
         >>= relativizeUrls
         >>= cleanIndexUrls
 
+  -- Create the 404 page, notably don't create a cleandRoute for it
+  match "404.md" $ do
+    route   $ setExtension "html"
+    compile $ pandocMathCompiler
+        >>= loadAndApplyTemplate "templates/default.html" defaultContext
+        >>= relativizeUrls
+
   -- Copy posts
   match "posts/*" $ do
     route cleanRoute
