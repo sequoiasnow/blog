@@ -24,3 +24,6 @@ function swapDarkLight() {
 
 // Restore theme from session
 setColorTheme(window.localStorage.getItem('color-theme'));
+
+// JS might not be enabled, if so we might want to hide the toggle.
+document.body.classList.add('js');
