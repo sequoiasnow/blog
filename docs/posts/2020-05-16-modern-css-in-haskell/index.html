@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thoughts! - - A Modern Approach to Css In Haskell</title>
+    <link rel="stylesheet" href="../../css/the.css" />
+
+    <!-- FavIcon  -->
+    <link rel="icon" href="../../images/favicon.svg">
+  </head>
+  <body>
+    <button class="dark-mode" onClick="swapDarkLight();">
+      Dark Mode
+    </button>
+    <div class="wrapper">
+      <nav>
+        <ul>
+          <li class="nav__title">
+            <a href="../../">Thoughts<span class="factorial">!</span></a>
+          </li>
+          <li class="nav__pages">
+            <ul>
+              <li><a href="../../">Home</a></li>
+              <li><a href="../../about/">About</a></li>
+              <li><a href="../../contact/">Contact</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <main role="main" class="content">
+        <article class="post">
+  <section class="post__header">
+    <span class="post__title">A Modern Approach to Css In Haskell</span>
+  </section>
+  <section class="post__body">
+    <p>Since I’ve been building this blog with <a href="https://jaspervdj.be/hakyll/">Hakyll</a> I’ve been attempting to use as much Haskell in its development as possible, both because I think it is the best way to make the project more cohesive and also because it’s a lot of fun :-]. One of the early stumbling blocks I found was integrate css into an otherwise haskell based project - even with a preprocessor css is hardly functional. Fortunately there exist some libraries out there that aim to solve exactly this problem. Foremost among them is <a href="http://fvisser.nl/clay">Clay</a>, a monadic CSS preprocessor which I decided to try out at once.</p>
+<!--more-->
+<p>CSS In clay looks something like the following,</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fancyButton ::</span> <span class="dt">Css</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>fancyButton <span class="ot">=</span> <span class="st">&quot;.fancy-button&quot;</span> <span class="op">?</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">do</span> backgroundColor   tomato</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>     sym2 padding      (em <span class="fl">0.5</span>) (em <span class="dv">1</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>     sym borderRadius  (px <span class="dv">5</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>     color             white</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>     border            solid (px <span class="dv">1</span>) red</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>     hover <span class="op">&amp;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>       <span class="kw">do</span> color        green</span></code></pre></div>
+<p>On the whole its quite accessible, and, after getting used to the way selectors are applied, Clay is quite easy to use. However, there are limitations. For one, it is difficult to provide any theme wrapper to the CSS monad, if we were so inclined. For instance if we were to wrap the <code>Css</code> monad with a reader so that we might access some theme object within our code:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Theme</span> <span class="ot">=</span> <span class="dt">Theme</span> {<span class="ot"> bg_color ::</span> <span class="dt">Color</span> }</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">ThemeCss</span> <span class="ot">=</span> <span class="dt">ReaderT</span> <span class="dt">Theme</span> <span class="dt">Css</span> ()</span></code></pre></div>
+<p>we immediately run into some problems. The previously easy syntax becomes riddled with <code>lift</code>s and absolutely untenable. As we continue other roadblocks make themselves manifest. The clay auto-prefixer for instance simply applies all browser prefixes to a property,</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">browsers ::</span> <span class="dt">Prefixed</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>browsers <span class="ot">=</span> <span class="dt">Prefixed</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  [ ( <span class="st">&quot;-webkit-&quot;</span>, <span class="st">&quot;&quot;</span> )</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  , (    <span class="st">&quot;-moz-&quot;</span>, <span class="st">&quot;&quot;</span> )</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  , (     <span class="st">&quot;-ms-&quot;</span>, <span class="st">&quot;&quot;</span> )</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  , (      <span class="st">&quot;-o-&quot;</span>, <span class="st">&quot;&quot;</span> )</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  , (         <span class="st">&quot;&quot;</span>, <span class="st">&quot;&quot;</span> )</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  ]</span></code></pre></div>
+<p>when in many cases the prefixes are less all encompassing. While hardly a huge problem this still means the generated CSS is less predictable as well as slightly larger.</p>
+<h2 id="can-we-do-better">Can We do Better?</h2>
+<p>All this made me wonder if there were any way to improve upon the already great work done in Clay? For instance it would be relatively simple to change the types of the <code>Css</code> monad to a class instead so that we could wrap it in a monad stack without worry. To that end, I decided to embark upon building an updated version of Clay with the goal of including the following features.</p>
+<h3 id="allowing-monadic-theming">Allowing Monadic Theming</h3>
+<p>The goal here is to allow something like</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>compileCss' (<span class="dt">Theme</span> { bg_color <span class="ot">=</span> red }) <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  h1 <span class="op">?</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    color   (t bg_color)</span></code></pre></div>
+<p>One of the notable benefits would be the ability to create light/dark mode themes without needlessly duplicating code.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>compileCss <span class="op">$</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;.dark&quot;</span>  <span class="op">?</span> withTheme darkTheme  ccsM</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;.light&quot;</span> <span class="op">?</span> withTheme lightTheme cssM</span></code></pre></div>
+<p>Of course this might be made even easier by making the theme a <code>Semigroup</code>.</p>
+<h3 id="defining-modern-css-rules">Defining Modern CSS Rules</h3>
+<p>One of the current annoyances in Clay is the lack of any definitions for <code>grid-</code> properties. A high priority would be the addition of modern CSS rules which are becoming increasingly popular. For instance we might define <code>grid-template-areas</code> in a strongly typed way.</p>
+<h3 id="allowing-var">Allowing <code>var</code></h3>
+<p>One of the great features of modern css has been css variables. Not only do these simplify styling, but they are the core of dynamic themeing. If we are to include themes in our css preprocessor it makes sense we should also include a way to make them dynamic. To that end we want to create a way to enable use of css variables, perhaps as extensions of themes. For instance,</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>compileCss' (<span class="dt">Theme</span> { bg_color <span class="ot">=</span> red }) <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  h1 <span class="op">?</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    color   (t bg_color)</span></code></pre></div>
+<p>might render</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode css"><code class="sourceCode css"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="in">:root</span> {</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">--bg-color</span>: <span class="cn">red</span><span class="op">;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>h1 {</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">color</span>: <span class="cn">red</span><span class="op">;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">color</span>: <span class="fu">var(</span><span class="va">--bg-color</span><span class="fu">)</span><span class="op">;</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>The goal would be to bind the development patterns in our css pre-processor as closely to modern css best practices as we can without sacrificing the benefits of our strongly typed haskell programming.</p>
+<h3 id="include-the-root-selector">Include The Root Selector</h3>
+<p>One of the older, but still popular conventions for CSS class naming is the BEM style, <code>.object__sub-object--modifier</code>. Sass makes this an easy format to use by introducing the <code>&amp;</code> selector which references the parent, a feature it seems worthwhile to include as a feature in our own preprocessor.</p>
+<h3 id="a-lack-of-css-duplication">A Lack of CSS Duplication</h3>
+<p>Although it has very little impact on the actual rendering of CSS, the duplication of styles in Clay is somewhat of an annoyance. Notably,</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>color       red</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>color       green</span></code></pre></div>
+<p>is rendered as</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode css"><code class="sourceCode css"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>color<span class="in">: red</span>;</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>color<span class="in">: green</span>;</span></code></pre></div>
+<p>whereas it would seem a simple effort to reduce this to <code>color: green</code>. Notably this allows extensions of mixin styles without unwanted duplication.</p>
+<h3 id="other-features">Other Features?</h3>
+<p>There may well be other features to include as development goes on, but for the moment we’ll settle on achieving these goals without sacrificing any of the incredible features already found in Clay. Over the course of the next few weeks, I’ll be posting updates on the development of this new system and the pitfalls and benefits of building such a system.</p>
+  </section>
+</article>
+
+      </main>
+
+    <footer class="page-footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </footer>
+
+    </div>
+
+
+    <!-- The Most Minimalist Javascript -->
+    <script src="../../js/the.js"></script>
+
+    <!-- The Less Minimalist MathJax -->
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

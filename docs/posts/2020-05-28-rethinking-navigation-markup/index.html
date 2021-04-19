@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thoughts! - - Rethinking Navigation Markup</title>
+    <link rel="stylesheet" href="../../css/the.css" />
+
+    <!-- FavIcon  -->
+    <link rel="icon" href="../../images/favicon.svg">
+  </head>
+  <body>
+    <button class="dark-mode" onClick="swapDarkLight();">
+      Dark Mode
+    </button>
+    <div class="wrapper">
+      <nav>
+        <ul>
+          <li class="nav__title">
+            <a href="../../">Thoughts<span class="factorial">!</span></a>
+          </li>
+          <li class="nav__pages">
+            <ul>
+              <li><a href="../../">Home</a></li>
+              <li><a href="../../about/">About</a></li>
+              <li><a href="../../contact/">Contact</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <main role="main" class="content">
+        <article class="post">
+  <section class="post__header">
+    <span class="post__title">Rethinking Navigation Markup</span>
+  </section>
+  <section class="post__body">
+    <p>The navigation for this blog is reasonably simple - partly because I’ve always found unnecessarily complex navigation to be tedious, and partly because minimalism is a theme in the design. We have three categories:</p>
+<ul>
+<li>A title segment linking to the home page.</li>
+<li>Several links to static pages.</li>
+<li>Some links to popular tags.</li>
+</ul>
+<p>At the time of this post, it looks something like:</p>
+<figure>
+<img src="../../images/2020-05-28/nav.png" width="168" alt="Navigation Tree" /><figcaption aria-hidden="true">Navigation Tree</figcaption>
+</figure>
+<p>Now, in my initial attempt I wrote this as follow:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;header</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;nav&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;div</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;nav__wrapper&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;div</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;nav__title&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>      <span class="kw">&lt;a</span> <span class="er">href</span><span class="ot">=</span><span class="st">&quot;/&quot;</span><span class="kw">&gt;</span>Thoughts<span class="kw">&lt;span</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;factorial&quot;</span><span class="kw">&gt;</span>!<span class="kw">&lt;/span&gt;&lt;/a&gt;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;/div&gt;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;nav</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;nav__pages&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>      <span class="kw">&lt;a</span> <span class="er">href</span><span class="ot">=</span><span class="st">&quot;/&quot;</span><span class="kw">&gt;</span>Home<span class="kw">&lt;/a&gt;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>      <span class="kw">&lt;a</span> <span class="er">href</span><span class="ot">=</span><span class="st">&quot;/about/&quot;</span><span class="kw">&gt;</span>About<span class="kw">&lt;/a&gt;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>      <span class="kw">&lt;a</span> <span class="er">href</span><span class="ot">=</span><span class="st">&quot;/contact/&quot;</span><span class="kw">&gt;</span>Contact<span class="kw">&lt;/a&gt;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;/nav&gt;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;nav</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;nav__tags&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>      <span class="kw">&lt;a</span> <span class="er">href</span><span class="ot">=</span><span class="st">&quot;/tags/math/&quot;</span><span class="kw">&gt;</span>Math <span class="kw">&lt;/a&gt;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>      <span class="kw">&lt;a</span> <span class="er">href</span><span class="ot">=</span><span class="st">&quot;/tags/philosophy/&quot;</span><span class="kw">&gt;</span>Philosophy<span class="kw">&lt;/a&gt;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>      <span class="kw">&lt;a</span> <span class="er">href</span><span class="ot">=</span><span class="st">&quot;/tags/programming/&quot;</span><span class="kw">&gt;</span>Programming<span class="kw">&lt;/a&gt;</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;/nav&gt;</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;/div&gt;</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;/header&gt;</span></span></code></pre></div>
+<p>There are some clear problems with this that I failed to notice while iterating over designs. Sometimes it’s easy to become so focused on rapidly prototyping new styles that common quality control gets left behind. Still, it’s never to late to return and fix up some glaring errors. Let’s look at some of them.</p>
+<h2 id="using-nav-correctly">Using <code>nav</code> Correctly</h2>
+<p>According to <a href="https://www.w3schools.com/TAgs/tag_nav.asp">w3schools</a>,</p>
+<blockquote>
+<p>The <code>&lt;nav&gt;</code> tag defines a set of navigation links.</p>
+<p>Notice that NOT all links of a document should be inside a <code>&lt;nav&gt;</code> element. The <code>&lt;nav&gt;</code> element is intended only for major block of navigation links.</p>
+<p>Browsers, such as screen readers for disabled users, can use this element to determine whether to omit the initial rendering of this content.</p>
+</blockquote>
+<p>Although we can use multiple <code>&lt;nav&gt;</code> tags across the site, it seems these are best understood as each applying to a separate navigational area. Since the chunk of html we are working with describes a <em>single</em> navigation tree, it makes since for the html to reflect that. We can make that change easily enough by wrapping our links in a list:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;nav&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;ul&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;li</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;nav__title&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>      <span class="kw">&lt;a</span> <span class="er">href</span><span class="ot">=</span><span class="st">&quot;/&quot;</span><span class="kw">&gt;</span>Thoughts<span class="kw">&lt;span</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;factorial&quot;</span><span class="kw">&gt;</span>!<span class="kw">&lt;/span&gt;&lt;/a&gt;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;/li&gt;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;li</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;nav__pages&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>      <span class="kw">&lt;ul&gt;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="kw">&lt;li&gt;&lt;a</span> <span class="er">href</span><span class="ot">=</span><span class="st">&quot;/&quot;</span><span class="kw">&gt;</span>Home<span class="kw">&lt;/a&gt;&lt;/li&gt;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="kw">&lt;li&gt;&lt;a</span> <span class="er">href</span><span class="ot">=</span><span class="st">&quot;/about/&quot;</span><span class="kw">&gt;</span>About<span class="kw">&lt;/a&gt;&lt;/li&gt;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="kw">&lt;li&gt;&lt;a</span> <span class="er">href</span><span class="ot">=</span><span class="st">&quot;/contact/&quot;</span><span class="kw">&gt;</span>Contact<span class="kw">&lt;/a&gt;&lt;/li&gt;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>      <span class="kw">&lt;/ul&gt;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;/li&gt;</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;li</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;nav__tags&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>      <span class="kw">&lt;ul&gt;</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="kw">&lt;li&gt;&lt;a</span> <span class="er">href</span><span class="ot">=</span><span class="st">&quot;/tags/math/&quot;</span><span class="kw">&gt;</span>Math <span class="kw">&lt;/a&gt;&lt;/li&gt;</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        <span class="kw">&lt;li&gt;&lt;a</span> <span class="er">href</span><span class="ot">=</span><span class="st">&quot;/tags/philosophy/&quot;</span><span class="kw">&gt;</span>Philosophy<span class="kw">&lt;/a&gt;&lt;/li&gt;</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        <span class="kw">&lt;li&gt;&lt;a</span> <span class="er">href</span><span class="ot">=</span><span class="st">&quot;/tags/programming/&quot;</span><span class="kw">&gt;</span>Programming<span class="kw">&lt;/a&gt;&lt;/li&gt;</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>      <span class="kw">&lt;/ul&gt;</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;/li&gt;</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="kw">&lt;/ul&gt;</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;/nav&gt;</span></span></code></pre></div>
+<p>Note that the wrapper div around the title link is no longer an anomaly, but fits in properly with the semantics of the remainder of the list.</p>
+<p>Moreover, though the above code is actually more nested than the original, its now very clear what’s going on. In fact we could add titles to our sections if they every grew to large, or add new ones as need be without having to write additional css. The class names remain only to differentiate borders and text size and could be made superfluous if we changed from the BEM naming convention.</p>
+<h2 id="superfluous-wrappers">Superfluous Wrappers</h2>
+<p>Really there’s no need for the <code>&lt;div class="nav__wrapper"&gt; ... &lt;/div&gt;</code> element, since our navigation makes absolutely no use of it. Granted, there are times when wrapping elements are a necessity, but these cases are astoundingly rare, usually being equivalent to some margin / grid specification. So, away with the unneeded <code>div</code>. The same goes for the <code>header</code> element, which itself serves only to confuse the situation as we have not the placed the <code>nav</code> element in an <code>article</code>. Hence we are left only with the abbreviated code above.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>Although the changes above are relatively simple, it can be very easy to ignore the small flaws in a working project once a prototype is done. I certainly have done this on a multitude of occasions, and I can say with certainty that fixing a problem when its spotted rather than assigning it to a todo list always leads to a better maintained project and saves a massive headache in the future.</p>
+<p>Keeping that in mind, what have we accomplished?</p>
+<ul>
+<li>The navigation element has eliminated superfluous wrappers which could confuse future styling</li>
+<li>The navigation has been made more accessible due to a correct use of lists and the <code>nav</code> element.</li>
+<li>Our styling can be easily generalized to any additional segments we might decide to add in the future.</li>
+</ul>
+  </section>
+</article>
+
+      </main>
+
+    <footer class="page-footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </footer>
+
+    </div>
+
+
+    <!-- The Most Minimalist Javascript -->
+    <script src="../../js/the.js"></script>
+
+    <!-- The Less Minimalist MathJax -->
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

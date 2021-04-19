@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thoughts! - - Prime Factorization</title>
+    <link rel="stylesheet" href="../../css/the.css" />
+
+    <!-- FavIcon  -->
+    <link rel="icon" href="../../images/favicon.svg">
+  </head>
+  <body>
+    <button class="dark-mode" onClick="swapDarkLight();">
+      Dark Mode
+    </button>
+    <div class="wrapper">
+      <nav>
+        <ul>
+          <li class="nav__title">
+            <a href="../../">Thoughts<span class="factorial">!</span></a>
+          </li>
+          <li class="nav__pages">
+            <ul>
+              <li><a href="../../">Home</a></li>
+              <li><a href="../../about/">About</a></li>
+              <li><a href="../../contact/">Contact</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <main role="main" class="content">
+        <article class="post">
+  <section class="post__header">
+    <span class="post__title">Prime Factorization</span>
+  </section>
+  <section class="post__body">
+    <p>Recently, I’ve been thinking about the disconnect between higher mathematics and what the layman thinks of as math. After all, the further you study mathematics the more you deal with abstract objects, proofs and logic - momentarily leaving behind the realm of computation for more fundamental results. However, there is an overlap, and one of the simplest examples I can give of that overlap are the prime numbers.</p>
+<p>An integer <span class="math inline">\(n \in \mathbb{Z}\)</span> is called prime if its only divisors are 1 and itself. Written in logical notation we might say <span class="math inline">\(n\)</span> is prime when</p>
+<p><span class="math display">\[
+m | n \quad \implies \quad m = 1 \quad\text{or}\quad m = n.
+\]</span></p>
+<p>Prime numbers have been studied since antiquity, in because they are inherently foundational to number theory.</p>
+<p>Perhaps the most famous example is <em>the fundamental theorem of arithmetic</em> which asserts that every integer <span class="math inline">\(n\)</span> is either 1 or can be expressed uniquely (up to sign) as a product of prime numbers,</p>
+<p><span class="math display">\[
+n = p_1^{e_1} p_2^{e_2} \cdots p_k^{e_k}, \qquad
+    e_i \in \mathbb{Z}_+, \text{$p$ prime}.
+\]</span></p>
+<p>Although the statement has far reaching implications it is actually quite simple to prove - indeed, the first proof is attributed to Euclid although it may have been known before him. The proof is inherently based upon the principal of induction, which I will remark upon briefly before proceeding.</p>
+<h2 id="induction">Induction</h2>
+<blockquote>
+<p>A well-known scientist (some say it was Bertrand Russell) once gave a public lecture on astronomy. He described how the earth orbits around the sun and how the sun, in turn, orbits around the centre of a vast collection of stars called our galaxy. At the end of the lecture, a little old lady at the back of the room got up and said: “What you have told us is rubbish. The world is really a flat plate supported on the back of a giant tortoise.” The scientist gave a superior smile before replying, “What is the tortoise standing on?” “You’re very clever, young man, very clever,” said the old lady. “But it’s turtles all the way down!”</p>
+<ul>
+<li>Stephen Hawking, <em>A Brief History of Time</em>.</li>
+</ul>
+</blockquote>
+<p>The key to induction is somewhat opposite the turtle principal - it is simply one thing building on what is already true. Simply put suppose we have an assertion <span class="math inline">\(A(n)\)</span> which we wish to verify for various cases <span class="math inline">\(n = 1, 2, 3, \dots\)</span>. Suppose we can show that <span class="math inline">\(A(1)\)</span> is true, how do we show the remaining infinite cases?</p>
+<p>Well since <span class="math inline">\(A(1)\)</span> is true, it follows that we can use <span class="math inline">\(A(1)\)</span> to prove <span class="math inline">\(A(2)\)</span>. Thus armed we can now prove <span class="math inline">\(A(3)\)</span> using <span class="math inline">\(A(1)\)</span> and <span class="math inline">\(A(2)\)</span>. Indeed, continuing in this manner, we see it suffices to prove that for any <span class="math inline">\(n\)</span> we can prove assertion <span class="math inline">\(A(n+1)\)</span> given that <span class="math inline">\(A(n), A(n-1), \dots A(1)\)</span> are true.</p>
+<p>The above is known colloquially as “strong induction” in reference to our reliance upon all <span class="math inline">\(1, \dots, n\)</span> assertions. Induction which relies only upon the <span class="math inline">\(n\)</span>th assertion to prove the <span class="math inline">\(n+1\)</span>th is typically called “weak” induction.</p>
+<h2 id="fundamental-theorem-of-arithmetic">Fundamental Theorem of Arithmetic</h2>
+<p>Let’s get back to the proof. We first show the existence of such a factorization by induction.</p>
+<p>To apply induction we first have to consider the base, or <span class="math inline">\(n=1\)</span> case. When <span class="math inline">\(n=1\)</span> then it is 1 and the assertion is proved. We now consider a general number <span class="math inline">\(n\)</span>, supposing that the assertion has been proved for all <span class="math inline">\(m &lt; n\)</span>. If <span class="math inline">\(n\)</span> is prime it is already a product of primes, <span class="math inline">\(n = n^1\)</span> and we are done. If not there exists some integers <span class="math inline">\(1 &lt; a &lt; b\)</span> such that <span class="math inline">\(ab = n\)</span>. But since <span class="math inline">\(a &lt; b &lt; n\)</span>, then the induction hypothesis applies and <span class="math inline">\(a = p_1^{e_1}p_2^{e_2}\cdots p_{k}^{e_k}\)</span> and <span class="math inline">\(b = q_1^{h_1}q_2^{h_2}\cdots q_l^{h_l}\)</span> which gives a prime factorization of <span class="math inline">\(n\)</span>, namely</p>
+<p><span class="math display">\[
+    n = ab = p_1^{e_1}p_2^{e_2}\cdots p_{k}^{e_k}
+             q_1^{h_1}q_2^{h_2}\cdots q_l^{h_l} .
+\]</span></p>
+<p>The more interesting part of the proof lies in showing that this factorization is in fact unique. What do we mean by unique? Basically that all <span class="math inline">\(p_i\)</span> and <span class="math inline">\(e_i\)</span> are unique, that any factorization consists of exactly one set of primes that each appear exactly so many times. We prove this as follows.</p>
+<p>Let <span class="math inline">\(s\)</span> be the smallest number with two distinct factorizations <span class="math inline">\(s = p_1p_2\cdots p_n\)</span>, <span class="math inline">\(s = q_1 q_2 \cdots q_m\)</span> (We know the exponents of the primes to be 1 since if any of the <span class="math inline">\(e_i\)</span> were <span class="math inline">\(&gt; 1\)</span> the number <span class="math inline">\(s'\)</span> made of their product would be a smaller number with distinct factorizations).</p>
+<p>First note that all the <span class="math inline">\(p_i\)</span> must be distinct from the <span class="math inline">\(q_j\)</span> since, were <span class="math inline">\(p_i = q_j\)</span> then by cancellation <span class="math inline">\(s / p_i = s/q_j\)</span> would be a number <span class="math inline">\(&lt; s\)</span> with distinct factorizations, which violates our assumption that <span class="math inline">\(s\)</span> is the smallest such number.</p>
+<p>Suppose without loss of generality that <span class="math inline">\(q_1 &gt; p_1\)</span> (if not simply re-label that <span class="math inline">\(q_i\)</span> as <span class="math inline">\(p_i\)</span> and vice versa). Then let</p>
+<p><span class="math display">\[ t = (q_1 - p_1)q_2q_3\cdots q_m. \]</span></p>
+<p>Since <span class="math inline">\(q_1 \neq p_1\)</span> and <span class="math inline">\(q_1 &gt; p_1\)</span>, it’s clear that <span class="math inline">\(t &gt; 0\)</span>. Moreover, since <span class="math inline">\((q_1 - p_1) &lt; q_1\)</span>, we see that <span class="math inline">\(t &lt; s\)</span> and hence must have a <em>unique</em> factorization. Expanding,</p>
+<p><span class="math display">\[
+t = q_1q_2\cdots q_m - p_1(q_2\cdots q_m) = s - p_1(q_2 \cdots q_m) =
+    p_1(p_2\cdots p_n - q_2 \cdots q_m).
+\]</span></p>
+<p>It’s easy to see that since <span class="math inline">\(t &gt; 0\)</span> and <span class="math inline">\(p_1 &gt; 0\)</span>, then <span class="math inline">\(s &gt; p_2 \cdots p_n - q_2 \cdots q_m &gt; 0\)</span> so it has a unique factorization which is a part of the factorization of <span class="math inline">\(t\)</span>, hence <span class="math inline">\(p_1\)</span> is in the unique factorization of <span class="math inline">\(t\)</span>. Let <span class="math inline">\(r_1\cdot r_k\)</span> be the factorization of <span class="math inline">\(q_1 - p_1\)</span> so that the unique factorization of <span class="math inline">\(t\)</span> is given as</p>
+<p><span class="math display">\[ t = (r_1\cdots r_k) q_2 \cdots q_m . \]</span></p>
+<p>Since we know <span class="math inline">\(p_1\)</span> is in that unique factorization, and <span class="math inline">\(p_1 \neq q_2 \neq \cdots q_m\)</span> then <span class="math inline">\(p_1\)</span> is a factor of <span class="math inline">\(q_1 - p_1\)</span>, that is there exists <span class="math inline">\(r\)</span> such that <span class="math inline">\(rp_1 = q_1 - p_1\)</span> which suggests that <span class="math inline">\(q_1 = (r + 1) p_1\)</span> which contradicts the assumption that <span class="math inline">\(p_1\)</span> is prime. Hence clearly this situation is impossible, and hence the factorization of any integer is indeed unique.</p>
+<hr />
+<p>The annoying thing about this proof is that it follows by contradiction. There is an old saying that proofs by contradiction are easy to write but hard to explain since they can delve into unrelated branches of mathematics in order to show that the result is contradictory. In this case the contradiction is clear to follow, but its difficult to see the clear chain of logic that led to the result you might have in a more constructive proof. There are, however, various proofs that do indeed provide a higher level proof of the above theorem. Let us look at one of them.</p>
+<h2 id="properties-of-the-riemann-zeta-function">Properties of the Riemann-Zeta Function</h2>
+<p>Riemann Zeta function is a beloved part of mathematics, not least because it continues to provide an active area of study in modern number theory. On first encounter the function</p>
+<p><span class="math display">\[
+\zeta(s) = \sum_{n=1}^\infty \frac{1}{n^s}
+\]</span></p>
+<p>seems to have little to do with number theory, yet it has come to underpin many of the most fascinating theories of the subject. In part, this is because we can express the zeta function via Euler’s product formula</p>
+<p><span class="math display">\[
+\zeta(s) = \prod_{\text{$p$ prime}} \frac{1}{1 - \frac{1}{p^s}}, \qquad \Re(s) &gt; 1.
+\]</span></p>
+<p>To see the relation we have to introduce some more advanced theory, namely it’s a well known (and easy to prove!) result that for <span class="math inline">\(\Re(s) &gt; 1\)</span></p>
+<p><span class="math display">\[ \frac{1}{1 -p^{-s}} = 1 + p^{-s} + p^{-2s} + p^{-3s} + \cdots \]</span></p>
+<p>Thus, if we take the product over all primes</p>
+<p><span class="math display">\[ \prod_{p} \frac{1}{1-p^{-s}} = \sum_{n} \frac{F(n)}{n^s} \]</span></p>
+<p>where <span class="math inline">\(F(n)\)</span> denotes the number of factorization of the integer <span class="math inline">\(n\)</span>. To see this note that we will have exactly <span class="math inline">\(F(n)\)</span> times that <span class="math inline">\(1/n\)</span> appears as a product of distinct primes.</p>
+<p>However, since we know that the Riemann zeta function is equal to Euler’s product formula we see that <span class="math inline">\(F(n) \equiv 1\)</span> for all <span class="math inline">\(n\)</span>, hence every prime factorization is unique.</p>
+<p>Its relatively easy to see that the <span class="math inline">\(\zeta\)</span> function is indeed equal to Euler’s product formula via some analytic methods and we will do so in another post. For now however, I think its fascinating how such a foundational result can be encoded in such a strange thing as the zeta function. Yet perhaps it is not so surprising, after all mathematics has always been bound up with the inexplicable beauty connecting the abstract to the tangible.</p>
+  </section>
+</article>
+
+      </main>
+
+    <footer class="page-footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </footer>
+
+    </div>
+
+
+    <!-- The Most Minimalist Javascript -->
+    <script src="../../js/the.js"></script>
+
+    <!-- The Less Minimalist MathJax -->
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

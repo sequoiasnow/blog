@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thoughts! - - The Infinite Library</title>
+    <link rel="stylesheet" href="../../css/the.css" />
+
+    <!-- FavIcon  -->
+    <link rel="icon" href="../../images/favicon.svg">
+  </head>
+  <body>
+    <button class="dark-mode" onClick="swapDarkLight();">
+      Dark Mode
+    </button>
+    <div class="wrapper">
+      <nav>
+        <ul>
+          <li class="nav__title">
+            <a href="../../">Thoughts<span class="factorial">!</span></a>
+          </li>
+          <li class="nav__pages">
+            <ul>
+              <li><a href="../../">Home</a></li>
+              <li><a href="../../about/">About</a></li>
+              <li><a href="../../contact/">Contact</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <main role="main" class="content">
+        <article class="post">
+  <section class="post__header">
+    <span class="post__title">The Infinite Library</span>
+  </section>
+  <section class="post__body">
+    <p>Arguably the strangest part of mathematics is the consideration of infinity. There is a kind of mysticism concerning limits at infinity that is left unadressed in an introductory calculus class where infinity is taken more as a tool than a mathematical object.</p>
+<p>One of the most intriguing expansions on the concept of infinite is the differentiation of higher infinities. At first, this doesn’t seem like it should be possible, after all what is larger than infinity? The answer to that question was provided by the ever insightful Georg Cantor who first pioneered the idea. One of the ways his idea concerning uncountability can be realized is the infinite library.</p>
+<h2 id="the-infinite-library">The Infinite Library</h2>
+<p>Consider a library of vast size. It is filled with shelves each packed with books, each seemingly identical a hundred pages long. You walk in and open the first book on the first shelf only to find it blank. On the second you find printed a single <code>a</code>. On the third <code>aa</code>, on the fourth, <code>aaa</code>. Eventaully the entire alphabet</p>
+<pre><code>abcdefghijklmnopqrstuvwxyz1234567890,?!'&quot;:;()/. </code></pre>
+<p>is enumerated through in every possible combination that can be fit within the 1000 page book. Within this library there are more books than there are atoms in the universe. Over <span class="math inline">\(7.9 \times 10^{262}\)</span> volumes, that is</p>
+<pre><code>79766443076872509863361000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000</code></pre>
+<p>books. It’s an unfathomable number, made more so by what this library would contain. Within it you would find the first 100 pages of every work of shakespear. You would find unpublished volumes never written. Within it would be definitive proof or counterexample to the Riemann Hypothesis. All of human knowledge that ever was or ever will be expressed within a hundred pages would be at home in the library.</p>
+<p>Now imagine that each book within the library were infinite, wouldn’t the library containing all such infinite books be something even larger? It turns out we can show this.</p>
+<h2 id="the-math">The Math</h2>
+<p>The standard form of infinity we are used to is called “countably” infinite. It’s analog is an infinite book, where ever character can be put in a line and enumerated (in mathematical terms any set which can be surjectivly projected onto by the natural numbers). Does this library conform to this same notion of infinity?</p>
+<p>Suppose the books in the library could be enumerated as <span class="math inline">\(B_1, B_2, B_3, \dots\)</span> and consider each book as an infinite sequence of characters, i.e</p>
+<p><span class="math display">\[B_i = ldsahfkjasdfbvkjbadcjkladfbgjkldafbgkfdhagkljdfkjlbadkfb...\]</span></p>
+<p>Were the library countable than every book within it could be enumerated in the list. Our goal then, is to construct a book within the library that is outside of any enumeration. This is commonly known as Cantor’s Diagonalization Argument and the origin of the notion of “uncountable.”</p>
+<p>Suppose we consider the list of books as</p>
+<p><span class="math display">\[
+\begin{align*}
+    B_1 &amp;= asdfbadf\dots \\
+    B_2 &amp;= lakjhdsf\dots \\
+    B_3 &amp;= ptsadfhg\dots \\
+    B_4 &amp;= hafgadjl\dots \\
+    &amp;\vdots
+\end{align*}
+\]</span></p>
+<p>Then let us construct a new book, <span class="math inline">\(B'\)</span> as follows. Let the <span class="math inline">\(i\)</span>th character of <span class="math inline">\(B'\)</span> be the character following the <span class="math inline">\(i\)</span>th character of <span class="math inline">\(B_i\)</span>. That is, supose the 2nd character of <span class="math inline">\(B_2\)</span> were <span class="math inline">\(a\)</span>, then the second character of <span class="math inline">\(B'\)</span> would be <span class="math inline">\(b\)</span>, and so on. (Perhaps <span class="math inline">\(z\)</span> would map to <span class="math inline">\(a\)</span> or <span class="math inline">\(.\)</span> to <span class="math inline">\(a\)</span> if we allow special characters in our book, then the cycle would repeat). In the case above we would have</p>
+<p><span class="math display">\[ B' = bbth... \]</span></p>
+<p>It’s easy to see that for every <span class="math inline">\(i\)</span>, the <span class="math inline">\(i\)</span>th character of <span class="math inline">\(B_i\)</span> will be distinct from the <span class="math inline">\(i\)</span>th character of <span class="math inline">\(B'\)</span> by our construction. But this is exactly the book we were looking for! Since <span class="math inline">\(B'\)</span> is distinct from every <span class="math inline">\(B_i\)</span> it clearly isn’t an element of the infinite sequence <span class="math inline">\(B_1, B_2, B_3, \dots\)</span> but is just as clearly a book in its own right. Hence, the library we have described can’t be countable and we must seek out the new world <strong>uncountable</strong>.</p>
+<h2 id="consequences">Consequences</h2>
+<p>The above diagonalization argument works for many sets, notably it is commonly used to show that the real numbers are uncountable. Indeed, replace our books with the decimal representations of real numbers and you get exactly the same proof. However, it leads to further thoughts on infinity. Is there something greater than uncountable? Well the same argument can be applied to ever greater sets, building up an (ironically countable) set of infinities. Going further there are even greater levels of infinity beyond the countable iterations, and it’s a fascinating topic that kept Georg Cantor up for much of his life.</p>
+<p>However, as soon as we hit uncountable things start to get interesting. Much of the most interesting examples in calculus such as the Cantor set or the Devil’s staircase arise naturally as a consequence of the interplay between countable and uncountable sets.</p>
+  </section>
+</article>
+
+      </main>
+
+    <footer class="page-footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </footer>
+
+    </div>
+
+
+    <!-- The Most Minimalist Javascript -->
+    <script src="../../js/the.js"></script>
+
+    <!-- The Less Minimalist MathJax -->
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>
