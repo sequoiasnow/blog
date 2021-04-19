@@ -12,44 +12,43 @@
   --color-text: var(--color-dark);
   --color-background: var(--color-white);;
 
-  --content-width: 500px;
+  --content-width: 600px;
   --content-padding: 2rem;
 
 
-  /* Old Hope */
-  --syntax-background: #1C1D20;
-  --syntax-numbers: #3f444a;
-  --syntax-default: #cbccd1; /* Normal */
-  --syntax-al: #78bd65;   /* Alert */
-  --syntax-an: #5B6268;  /* Annotation */
-  --syntax-at: #ee7b29;  /* Attribute */
-  --syntax-bn: #1B2229;  /* BaseN */
-  --syntax-bu: #fedd38;  /* BuiltIn */
-  --syntax-cf: #ea3d54;   /* ControlFlow */
-  --syntax-ch: #4fb3d8;  /* Char */
-  --syntax-cn: #ee7b29;   /* Constant */
-  --syntax-co: #5B6268;  /* Comment */
-  --syntax-cv: #7AC5E2;  /* CommentVar */
-  --syntax-do: #7AC5E2;  /* Documentation */
-  --syntax-dt: #ee7b29;  /* DataType */
-  --syntax-dv: #ee7b29;  /* DecVal */
-  --syntax-er: #ea3d54;   /* Error */
-  --syntax-ex: #78BD66;   /* Extension */
-  --syntax-fl: #ee7b29;  /* Float */
-  --syntax-fu: #fedd38;  /* Function */
- --syntax-im: #ea3d54;  /* Import */
- --syntax-in: #ea3d54;  /* Information */
- --syntax-kw: #ea3d54;   /* Keyword */
- --syntax-op: #78bd65;  /* Operator */
- --syntax-ot: #78bd65;  /* Other */
- --syntax-pp: #78bd65;  /* Preprocessor */
- --syntax-re: #31363B;   /* RegionMarker */
- --syntax-sc: #4fb3d8; /* SpecialChar */
- --syntax-ss: #4fb3d8;   /* SpecialString */
- --syntax-st: #4fb3d8;  /* String */
- --syntax-va: #cbccd1;  /* Variable */
- --syntax-vs:#4fb3d8;  /* VerbatimString */
- --syntax-wa: #fedd38;  /* Warning */
+  /* Solarized Light */
+  --syntax-background: #fdf6e3;
+  --syntax-numbers: #657b83;
+  --syntax-default: #657b83; /* Normal */
+  --syntax-al: #DC322F;   /* Alert */
+  --syntax-an: #93A1A1;  /* Annotation */
+  --syntax-at: #657B83;  /* Attribute */
+  --syntax-bn: #2AA198;  /* BaseN */
+  --syntax-bu: #657B83;  /* BuiltIn */
+  --syntax-cf: #859900;   /* ControlFlow */
+  --syntax-ch: #2AA198;  /* Char */
+  --syntax-cn: #2AA198;   /* Constant */
+  --syntax-co: #93A1A1;  /* Comment */
+  --syntax-cv: #93A1A1;  /* CommentVar */
+  --syntax-do: #93A1A1;  /* Documentation */
+  --syntax-dt: #B58900;  /* DataType */
+  --syntax-dv: #2AA198;  /* DecVal */
+  --syntax-er: #DC322F;   /* Error */
+  --syntax-ex: #657B83;   /* Extension */
+  --syntax-fl: #2AA198;  /* Float */
+  --syntax-fu: #268BD2;  /* Function */
+  --syntax-im: #657B83;  /* Import */
+  --syntax-in: #93A1A1;  /* Information */
+  --syntax-kw: #859900;   /* Keyword */
+  --syntax-op: #859900;  /* Operator */
+  --syntax-ot: #268BD2;  /* Other */
+  --syntax-pp: #CB4B16;  /* Preprocessor */
+  --syntax-sc: #DC322F;/* SpecialChar */
+  --syntax-ss: #DC322F;   /* SpecialString */
+  --syntax-st: #2AA198; /* String */
+  --syntax-va: #268BD2; /* Variable */
+  --syntax-vs: #657B83; /* VerbatimString */
+  --syntax-wa: #CB4B16;  /* Warning */
 }
 
 .dark {
@@ -57,6 +56,7 @@
   --color-text: var(--color-white);;
   --color-background: var(--color-dark);
 
+  /* Old Hope */
   --syntax-background: #1C1D20;
   --syntax-numbers: #3f444a;
   --syntax-default: #cbccd1; /* Normal */
@@ -99,7 +99,7 @@
 body, html {
   padding: 0;
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   line-height: 1.5;
   min-height: 100vh;
   background-color: var(--color-background);
@@ -194,8 +194,8 @@ pre {
 }
 
 
-/* CSS variables don't work in media queries... --content-width: 500px; */
-@media only screen and (min-width: 500px) {
+/* CSS variables don't work in media queries... --content-width: 600px; */
+@media only screen and (min-width: 600px) {
   div.sourceCode {
     --w: 100vw;
     width: var(--w);
@@ -241,8 +241,8 @@ nav ul {
   padding: 0;
 }
 
-/* CSS variables don't work in media queries... --content-width: 500px; */
-@media only screen and (min-width: 500px) {
+/* CSS variables don't work in media queries... --content-width: 600px; */
+@media only screen and (min-width: 600px) {
   nav ul {
     flex-direction: row;
   }
