@@ -1,14 +1,15 @@
 --------------------------------------------------------------------------------
 {-# LANGUAGE OverloadedStrings #-}
 
+import           Data.List                       (isSuffixOf, sortBy)
+import qualified Data.Set                        as S
 import           Hakyll
+import           System.FilePath.Posix           (takeBaseName, takeDirectory,
+                                                  (</>))
 import           Text.Blaze.Html                 (toHtml, toValue, (!))
-import           Data.List              (sortBy,isSuffixOf)
+import           Text.Blaze.Html.Renderer.String (renderHtml)
 import qualified Text.Blaze.Html5                as H
 import qualified Text.Blaze.Html5.Attributes     as A
-import           Text.Blaze.Html.Renderer.String (renderHtml)
-import           System.FilePath.Posix  (takeBaseName,takeDirectory,(</>))
-import qualified Data.Set as S
 import           Text.Pandoc.Options
 
 --------------------------------------------------------------------------------
@@ -72,8 +73,15 @@ cleanIndexUrls = return . fmap (withUrls clean)
 
 
 --------------------------------------------------------------------------------
+
+config :: Configuration
+config = defaultConfiguration
+  { destinationDirectory = "docs"
+  }
+
+
 main :: IO ()
-main = hakyll $ do
+main = hakyllWith config $ do
   -- Compile post tags for the site
   tags <- buildTags "posts/*" (fromCapture "tags/*.html")
   categories <- buildCategories "posts/*" (fromCapture "cat/*.html")
@@ -172,6 +180,11 @@ main = hakyll $ do
         >>= loadAndApplyTemplate "templates/default.html" tagsCtx
         >>= relativizeUrls
         >>= cleanIndexUrls
+
+  -- robots
+  match "robots.txt" $ do
+    route   idRoute
+    compile copyFileCompiler
 
   -- Create a sitemap
   create ["sitemap.xml"] $ do
