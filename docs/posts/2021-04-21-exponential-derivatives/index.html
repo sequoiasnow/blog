@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Thoughts! - - math</title>
+    <title>Thoughts! - - Derivative's of Exponent's</title>
     <link rel="stylesheet" href="../../css/the.css" />
 
     <!-- FavIcon  -->
@@ -41,20 +41,46 @@
 
       <main role="main" class="content">
         <article class="post">
-  <header class="post__header">
-    <span class="post__title"><span title="All pages tagged 'math'." class="tag tag--math">math</span></span>
-  </header>
+  <section class="post__header">
+    <span class="post__title">Derivative's of Exponent's</span>
+  </section>
   <section class="post__body">
-    <div class="postlist">
-  
-  <a class="postlist__post" href="../../posts/2021-04-21-exponential-derivatives/">Derivative's of Exponent's</a>
-  
-  <a class="postlist__post" href="../../posts/2020-06-05-the-infinite-library/">The Infinite Library</a>
-  
-  <a class="postlist__post" href="../../posts/2020-05-31-prime-factorization/">Prime Factorization</a>
-  
-</div>
-
+    <p>Let’s start by taking the derivative of <span class="math inline">\(e^x\)</span>. There are a few ways to do this, some as simple as using Euler’s identity, but perhaps the easiest is by way of the chain rule. To do this we first need the derivative of <span class="math inline">\(\ln(x)\)</span>. Recall that</p>
+<p><span class="math display">\[ e = \lim_{h\to 0} \frac{1}{(1+h)^h} \]</span></p>
+<p>and hence for any <span class="math inline">\(x\)</span> we can write</p>
+<p><span class="math display">\[
+e = \lim_{ h / x \to 0} \frac{1}{\Big(1+\frac{h}{x}\Big)^{h/x}}
+  = \lim_{ h / x \to 0} \Big ( 1 + \frac{h}{x}\Big )^\frac{x}{h}
+\]</span></p>
+<p>as a change of variables. Raising both sides to the <span class="math inline">\(1/x\)</span> we get that</p>
+<p><span class="math display">\[
+e^{\frac{1}{x}}
+= \lim_{h/x \to 0} \Big( 1 + \frac{h}{x} \Big)^\frac{1}{h}
+\]</span></p>
+<p>Now, we can plug this into the definition of the derivative for logarithm, and see that</p>
+<p><span class="math display">\[
+\begin{align*}
+\frac{d}{dx} \ln(x) &amp;= \lim_{h \to 0} \frac{\ln (x + h) - \ln(x)}{h} \\
+&amp;= \lim_{h\to 0} \frac{\ln\Big(\frac{x+h}{x}\Big)}{h} \\
+&amp;= \lim {h\to 0} \frac{\ln\Big(1 + \frac{h}{x}\Big)}{h} \\
+&amp;= \lim_{h\to 0} \frac{\ln\big(e^\frac{h}{x}\big)}{h} \\
+&amp;= \frac{1}{x}
+\end{align*}
+\]</span></p>
+<p>It then becomes easy to find the derivative of <span class="math inline">\(f(x) = e^x\)</span> as well, since <span class="math inline">\({\ln\big(e^x\big)} = x\)</span>, we have by the chain rule</p>
+<p><span class="math display">\[
+\frac{d}{dx} \ln(e^x) = \frac{1}{e^x} (e^x)' = 1
+\]</span> 4 Thus, clearly by multiplying: <span class="math inline">\(\frac{d}{dx} e^x = e^x\)</span>.</p>
+<h2 id="other-exponents">Other Exponents</h2>
+<p>Now, let’s consider a more generic context. Let <span class="math inline">\(a\)</span> be a constant, we can find the derivative of <span class="math inline">\(a^x\)</span> by use of the previous derivatives. Namely</p>
+<p><span class="math display">\[
+\begin{align*}
+\frac{d}{dx} a^x &amp;= \frac{d}{dx} e^{\ln\big(a^x\big)} \\
+&amp;= \frac{d}{dx} e^{x\ln(a)} \\
+&amp;= \ln(a) e^{x\ln(a)} \\
+&amp;= \ln(a) a^x.
+\end{align*}
+\]</span></p>
   </section>
 </article>
 
