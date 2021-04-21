@@ -4,6 +4,7 @@
 import           Data.List                       (isSuffixOf, sortBy)
 import qualified Data.Set                        as S
 import           Hakyll
+import           Hakyll.Favicon
 import           System.FilePath.Posix           (takeBaseName, takeDirectory,
                                                   (</>))
 import           Text.Blaze.Html                 (toHtml, toValue, (!))
@@ -52,6 +53,10 @@ renderTag tag mbPath = Just $ case mbPath of
       _ ->
         toHtml tag
 
+--------------------------------------------------------------------------------
+
+baseContext :: Context String
+baseContext = faviconsField <> defaultContext
 
 --------------------------------------------------------------------------------
 
@@ -92,7 +97,7 @@ main = hakyllWith config $ do
                 dateField "date" "%B %e, %Y"                            <>
                 teaserField "teaser" "content"                          <>
                 constField "root" root                                  <>
-                defaultContext
+                baseContext
 
   -- Compiles a tags page, in homage to the archive page.
   tagsRules tags $ \tag pat -> do
@@ -105,7 +110,7 @@ main = hakyllWith config $ do
       let ctx = constField "title" title                 <>
                 constField "title_html" titleHtml        <>
                 listField "posts" postCtx (return posts) <>
-                defaultContext
+                baseContext
 
       makeItem ""
           >>= loadAndApplyTemplate "templates/tag.html" ctx
@@ -114,7 +119,8 @@ main = hakyllWith config $ do
           >>= cleanIndexUrls
 
 
-  -- Compiles Categories
+
+  faviconsRules "images/favicon.svg"
 
   -- Copy images over
   match "images/**/*" $ do
@@ -144,7 +150,7 @@ main = hakyllWith config $ do
   match (fromList ["about.md", "contact.markdown"]) $ do
     route   $ cleanRoute
     compile $ pandocMathCompiler
-        >>= loadAndApplyTemplate "templates/default.html" defaultContext
+        >>= loadAndApplyTemplate "templates/default.html" baseContext
         >>= relativizeUrls
         >>= cleanIndexUrls
 
@@ -152,7 +158,7 @@ main = hakyllWith config $ do
   match "404.md" $ do
     route   $ setExtension "html"
     compile $ pandocMathCompiler
-        >>= loadAndApplyTemplate "templates/default.html" defaultContext
+        >>= loadAndApplyTemplate "templates/default.html" baseContext
 
   -- Copy posts
   match "posts/*" $ do
@@ -173,7 +179,7 @@ main = hakyllWith config $ do
       let tagsCtx = constField "title" "Tags"                <>
                     listField "posts" postCtx (return posts) <>
                     tagCloudField "tagCloud" 50 150 tags     <>
-                    defaultContext
+                    baseContext
 
       makeItem ""
         >>= loadAndApplyTemplate "templates/tags.html" tagsCtx
@@ -208,7 +214,7 @@ main = hakyllWith config $ do
       let indexCtx =
               listField "posts" postCtx (return posts) <>
               constField "title" "Home"                <>
-              defaultContext
+              baseContext
 
       getResourceBody
           >>= applyAsTemplate indexCtx

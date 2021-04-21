@@ -41,7 +41,8 @@ packages:
 #
 # extra-deps: []
 extra-deps:
-  - hakyll-4.14.0.0
+- hakyll-4.14.0.0
+- hakyll-favicon-0.1.0@sha256:79ae766d7282129c2c1a10c4264c7bad4d44cb83fb76d6242bc4545ea5c2ade4,1361
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

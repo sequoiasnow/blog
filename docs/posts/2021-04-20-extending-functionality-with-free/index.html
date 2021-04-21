@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thoughts! - - Extending Capability's With Free</title>
+    <link rel="stylesheet" href="../../css/the.css" />
+
+    <!-- FavIcon  -->
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"><link rel="shortcut icon" href="../../images/favicons/favicon32.png"><link rel="apple-touch-icon-precomposed" sizes="144x144" href="../../images/favicons/favicon144.png"><link rel="apple-touch-icon-precomposed" sizes="114x114" href="../../images/favicons/favicon114.png"><link rel="apple-touch-icon-precomposed" sizes="72x72" href="../../images/favicons/favicon72.png"><link rel="apple-touch-icon-precomposed" sizes="57x57" href="../../images/favicons/favicon57.png">
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.css" integrity="sha384-Cqd8ihRLum0CCg8rz0hYKPoLZ3uw+gES2rXQXycqnL5pgVQIflxAUDS7ZSjITLb5" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.js" integrity="sha384-1Or6BdeNQb0ezrmtGeqQHFpppNd7a/gw29xeiSikBbsb44xu3uAo8c7FwbF5jhbd" crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+  </head>
+  <body>
+    <button class="dark-mode" onClick="swapDarkLight();">
+      Dark Mode
+    </button>
+    <div class="wrapper">
+      <nav>
+        <ul>
+          <li class="nav__title">
+            <a href="../../">Thoughts<span class="factorial">!</span></a>
+          </li>
+          <li class="nav__pages">
+            <ul>
+              <li><a href="../../">Home</a></li>
+              <li><a href="../../about/">About</a></li>
+              <li><a href="../../contact/">Contact</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <main role="main" class="content">
+        <article class="post">
+  <section class="post__header">
+    <span class="post__title">Extending Capability's With Free</span>
+  </section>
+  <section class="post__body">
+    <p>One of the more popular topics in the Haskell ecosystem is the use of so called <code>Free</code> monads to create descriptive and IO free programs. However, the concept of lifting type functionality with <code>Free</code> is not unique to monadic computation. Let’s look a bit at the theory and practice behind the <code>Free</code> approach in Haskell.</p>
+<h2 id="abstract-algebra">Abstract Algebra</h2>
+<p>In abstract algebra the concept of <em>free</em> is a method of extending the functionality of an algebraic structure like a set or group to a more complex structure by dramatically enlarging it’s structure. This notion is generalized in category theory to the notion of a free functor.</p>
+<p>Consider a category <span class="math inline">\(\mathbb{C}\)</span> of algebraic structures (such as groups, algebras, vector spaces, etc…) and the forgetful functor <span class="math inline">\(U : \mathbb{C} \to \mathbf{Set}\)</span> which takes algebraic structures and reduces them to sets, ignoring all operations. The <strong>free functor</strong> <span class="math inline">\(F : \mathbf{Set} \to F(X)\)</span> is a left adjoint of <span class="math inline">\(U\)</span>, i.e. <span class="math inline">\(F\)</span> takes sets <span class="math inline">\(X\)</span> back into the category <span class="math inline">\(\mathbb{C}\)</span> such that <span class="math inline">\(F \circ U = \mathbf{id}\)</span>. We refer to <span class="math inline">\(F(X)\)</span> as the <strong>free object</strong> of the free functor <span class="math inline">\(F\)</span>.</p>
+<p>This allows us to define the following universal property. For <span class="math inline">\(A\)</span> an algebraic structure of <span class="math inline">\(\mathbb{C}\)</span>, let <span class="math inline">\(\phi : X -&gt; U(A)\)</span> be a function between sets, then we can lift <span class="math inline">\(\phi\)</span> to a morphism <span class="math inline">\(\hat{\phi} : F(X) \to A\)</span> of <span class="math inline">\(\mathbb{C}\)</span> defined by the following commutative diagram.</p>
+<p><span class="math display">\[
+\begin{CD}
+    X @&gt;\phi&gt;&gt; U(A) \\
+    @VVFV  @AAUA \\
+    F(X) @&gt;\hat{\phi}&gt;&gt; A
+\end{CD}
+\]</span></p>
+<h3 id="concrete-example">Concrete Example</h3>
+<p>Consider a function <span class="math inline">\(f\)</span> from a set <span class="math inline">\(X\)</span> to the underlying set of a group <span class="math inline">\(G\)</span>. In an abuse of notation we write <span class="math inline">\(f: X \to G\)</span> (properly it should be <span class="math inline">\(X \to U(X)\)</span> where <span class="math inline">\(U\)</span> is the forgetful functor <span class="math inline">\(U : \mathbf{Grp} \to \mathbf{Set}\)</span>. There exists a free functor <span class="math inline">\(F : \mathbf{Set} \to F(X)\)</span> defined as follows. Suppose <span class="math inline">\(X\)</span> a set of symbols and define in addition a set <span class="math inline">\(X^{-1}\)</span> of symbols each of which corresponds to precisely one symbol in <span class="math inline">\(X\)</span>. We call the members of <span class="math inline">\(X^{-1}\)</span> the inverses of the elements of <span class="math inline">\(X\)</span>. Let <span class="math inline">\(Y = X \cup X^{-1}\)</span>. We then define <span class="math inline">\(F(X)\)</span> as follows.</p>
+<p>Let a <em>word</em> be an element of the monoid generated by <span class="math inline">\(Y\)</span>, that is a number of symbols in <span class="math inline">\(Y\)</span> written together. We call a word reduced if it’s inverses cancel out, i.e. <span class="math inline">\(a = ab^{-1}b = bb^{-1}a = ...\)</span>. Then <span class="math inline">\(F(X)\)</span> is the collection of reduced words.</p>
+<p>This allows us to define a universal property for groups. Namely that our function <span class="math inline">\(f\)</span> extends to a group morphism <span class="math inline">\(\hat{f} : F(X) \to G\)</span> by the following commutative diagram.</p>
+<p><span class="math display">\[
+\begin{CD}
+    X @&gt;f&gt;&gt; U(G) \\
+    @VVFV  @AAUA \\
+    F(X) @&gt;\hat{f}&gt;&gt; G
+\end{CD}
+\]</span></p>
+<p>In this way we’ve defined a function <span class="math inline">\(\hat{f}\)</span> to be a morphism of groups, thereby extending it’s functionality. Although this might seem a bit like whichcraft, it’s worth considering just how large a set <span class="math inline">\(F(X)\)</span> we had to create in order to define that morphism. The trick to the use of free objects, is that they require building an immensely larger structure than the function was initially defined upon. Effectively, since <span class="math inline">\(X\)</span> is in this case a basis for <span class="math inline">\(F(X)\)</span>, the free space is the generation of an algebraic structure <span class="math inline">\(F(X)\)</span> from that basis <span class="math inline">\(X\)</span>.</p>
+<h2 id="applications-in-haskell">Applications In Haskell</h2>
+<p>So, how does this relate to Haskell? After all, theory is great but the title of this post did relate to programming. Well, let’s look up some examples.</p>
+<h3 id="monoids">Monoids</h3>
+<blockquote>
+<p>A monoid is a set equipped with a single associative operation and an identity element.</p>
+</blockquote>
+<p>The prototypical example of a monoid is a list <code>[a]</code>. It contains an identity element <code>[]</code> and an associative operation <code>++</code>. It is also the prime example of the elevation of a data structure to added capability. Consider the following example.</p>
+<p>Suppose we are building a function to validate a user’s password. We would like to be able to return some manner of error or success, and so we define a type for our potential errors.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">PasswordErr</span> <span class="ot">=</span> <span class="dt">PasswordToShort</span> <span class="op">|</span> <span class="dt">PasswordToSimple</span> <span class="op">|</span> <span class="dt">PasswordWellKnown</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">deriving</span> (<span class="dt">Eq</span>, <span class="dt">Show</span>)</span></code></pre></div>
+<p>This allows our function to return information about what exactly our password has passed.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">validatePass ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Either</span> <span class="dt">PasswordErr</span> <span class="dt">Text</span></span></code></pre></div>
+<p>However, we now come to the ubiquitous user complaint, they fix one error only for another to crop up. Since they are not exclusive this is frustrating for someone trying to sign up, ideally we need a way to concatenate our errors for response. Ideally we would turn <code>PasswordErr</code> into a monoid to allow for concatenating errors. A first attempt might be</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">PasswordErr2</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="ot">=</span> <span class="dt">PasswordToShort</span> <span class="dt">PasswordErr2</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> <span class="dt">PasswordToSimple</span> <span class="dt">PasswordErr2</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> <span class="dt">PasswordWellKnown</span> <span class="dt">PaswordErr</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> <span class="dt">PaswordNoError</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">deriving</span> (<span class="dt">Show</span>, <span class="dt">Eq</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Semigroup</span> <span class="dt">PasswordErr2</span> <span class="kw">where</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">PasswordToShort</span> x)   <span class="op">&lt;&gt;</span> y <span class="ot">=</span> <span class="dt">PasswordToShow</span> (x <span class="op">&lt;&gt;</span> y)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">PasswordtoSimple</span> x)  <span class="op">&lt;&gt;</span> y <span class="ot">=</span> <span class="dt">PasswordToSimple</span> (x <span class="op">&lt;&gt;</span> y)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">PasswordWellKnown</span> x) <span class="op">&lt;&gt;</span> y <span class="ot">=</span> <span class="dt">PasswordWellKnown</span> (x <span class="op">&lt;&gt;</span> y)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">PasswordNoError</span>       <span class="op">&lt;&gt;</span> y <span class="ot">=</span> y</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    x       <span class="op">&lt;&gt;</span> <span class="dt">PasswordNoError</span> <span class="ot">=</span> x</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monoid</span> <span class="dt">PasswordErr2</span> <span class="kw">where</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mempty</span> <span class="ot">=</span> <span class="dt">PasswordNoError</span></span></code></pre></div>
+<p>Admittedly, this is very crude, and quite a lot to type out. It’s also not exactly quite clear how we would go about deconstructing errors, but in the interim it does somewhat work.</p>
+<p>Luckily, there is an easier way! Recall that we mentioned <code>[a]</code> as the prototypical example of a monoid, but in so doing entirely failed to mention a key component <code>a</code>. Indeed, the morphism <span class="math display">\[ \texttt{a} \to \texttt{[a]} \]</span> is exactly a free functor from the category of sets to the category of monoids! Hence it follows that we may extend our function to work on Monoids using the original definition of <code>PasswordErr</code>!</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">validatePassword ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Either</span> [<span class="dt">PasswordErr</span>] <span class="dt">Text</span></span></code></pre></div>
+<p>Now, on the face of it this doesn’t seem like a particularly impressive achievement. In fact it is rather obvious without all the category theory talk to introduce it, however, things become much more interesting when we apply the same theory to more interesting categories.</p>
+<h2 id="fixing-functors">Fixing Functors</h2>
+<p>Consider a more complicated example this time. Suppose we’re setting up a program to be used by a local DJ. We want to be able to spell out what songs are played, when breaks are taken, and when the evening comes to a close. We might write this schedule as a follows.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Playlist</span> a next</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="ot">=</span> <span class="dt">Play</span> a next</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> <span class="dt">Pause</span> <span class="dt">Int</span> next</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> <span class="dt">Done</span></span></code></pre></div>
+<p>We can then setup a simple program,</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- play (Song &quot;Kraftwerk&quot; &quot;Computer Love&quot;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- pause 3</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- done</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Play</span> (<span class="dt">Song</span> <span class="st">&quot;Kraftwerk&quot;</span> <span class="st">&quot;Computer Love&quot;</span>) (<span class="dt">Pause</span> <span class="dv">3</span> <span class="dt">Done</span>)<span class="ot"> ::</span> (<span class="dt">Playlist</span> <span class="dt">Song</span> (<span class="dt">Playlist</span> a (<span class="dt">Playlist</span> b next)))</span></code></pre></div>
+<p>Almost immediately we run into a problem. Because the type signature mirrors our program, it’s impossible to work with the program as a generic object without also specifying the complete type. Ideally we would like some type of <code>Playlist'</code> type which would encapsulate a generic program.</p>
+<p>Fortunately mathematics has been here before and can help us out. Namely there is a concept known as a <em>fixed point</em>, that is a point that is not moved by a function, i.e. <span class="math inline">\(f(x) = x\)</span>, moreover, in special cases, any iteration of points near the fixed point will lead to it. In limit terms if <span class="math inline">\(f_n (x) = f( f_{n-1} (x))\)</span> then eventually for some <span class="math inline">\(y\)</span> in a neighborhood of <span class="math inline">\(x\)</span>,</p>
+<p><span class="math display">\[
+\lim_{n \to \infty} f_n (y) = x.
+\]</span></p>
+<p>We can represent this iteration in haskell as well through a recursive type,</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Fix</span> f <span class="ot">=</span> <span class="dt">Fix</span> (f (<span class="dt">Fix</span> f))</span></code></pre></div>
+<p>At first glance these look incongruous, but consider that when <code>f</code> is a function <code>f :: a -&gt; b</code> the above definition becomes (with some questionable syntax):</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Fix</span> (a <span class="ot">-&gt;</span> b) <span class="ot">=</span> <span class="dt">Fix</span> (a <span class="ot">-&gt;</span> <span class="dt">Fix</span> (a <span class="ot">-&gt;</span> b))</span></code></pre></div>
+<p>Every input of <code>a</code> gives the same recursive definition, i.e. <span class="math inline">\(\texttt{Fix} (f) \sim f_\infty\)</span>. Since morphisms between types can be viewed as functors and <code>Playlist</code> is readily a <code>Functor</code>:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> (<span class="dt">Playlist</span> x)  <span class="kw">where</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fmap</span> f (<span class="dt">Play</span> s next) <span class="ot">=</span> <span class="dt">Play</span> s (f next)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fmap</span> f (<span class="dt">Pause</span> n next) <span class="ot">=</span> <span class="dt">Pause</span> n (f next)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fmap</span> _ <span class="dt">Done</span> <span class="ot">=</span> <span class="dt">Done</span></span></code></pre></div>
+<p>It’s easy to see how <code>Fix</code> allows us to define a fixed chain of functors, such as the following.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Fix</span> (<span class="dt">Play</span> (<span class="dt">Song</span> <span class="st">&quot;Kraftwerk&quot;</span> <span class="st">&quot;Computer Love&quot;</span>) (<span class="dt">Fix</span> <span class="dt">Done</span>))<span class="ot"> ::</span> <span class="dt">Fix</span> (<span class="dt">Playlist</span> <span class="dt">Song</span>)</span></code></pre></div>
+<p>With this type level logic in hand we can now define playlists as needed but there remains some room for improvement. For instance, although we can now define an entire playlist chain using <code>Fix</code>, it’s still not possible for us to write individual components of the playlist, or subsets of our playlist for reuse. To tackle this issue we have to introduce a new concept, the <code>Free</code> monad.</p>
+<h3 id="free-monads">Free Monads</h3>
+<p>We now come back to the starting principle of universal properties. Namely, the problem with the setup using <code>Fix</code> is the inability to setup smaller sub-programs which can be <em>bound</em> together. That functionality is bound up within the <code>Monad</code> class, so our question becomes, what is the <code>Free</code> object which elevates a <code>Functor</code> to a <code>Monod</code>, just as <code>[*]</code> elevated a <code>Set</code> to a <code>Monoid</code>? Well at it’s core a Monad has two operations, <em>bind</em> and <em>return</em>. We can describe both of these in a type <code>Free</code><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> as follows</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Free</span> f r <span class="ot">=</span> <span class="dt">Free</span> (f (<span class="dt">Free</span> f r)) <span class="op">|</span> <span class="dt">Pure</span> r</span></code></pre></div>
+<p>It’s easy to see that the <code>return</code> instance is setup for us.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> (<span class="dt">Functor</span> f) <span class="ot">=&gt;</span> <span class="dt">Monad</span> (<span class="dt">Free</span> f) <span class="kw">where</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> <span class="ot">=</span> <span class="dt">Pure</span></span></code></pre></div>
+<p>However, what about the first component? It looks exactly like our definition of <code>Fix</code>, and indeed a binding application simply operates on the last element of the chain, changing only the type <code>r</code>.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">Free</span> x) <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> <span class="dt">Free</span> (<span class="fu">fmap</span> (<span class="op">&gt;&gt;=</span> f) x)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">Pure</span> x) <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> f x</span></code></pre></div>
+<p>Moreover, as we would expect from a universal property we have a functor which carries a functor to the <code>Free</code> monad.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ot">liftF ::</span> (<span class="dt">Functor</span> f) <span class="ot">=&gt;</span> f a <span class="ot">-&gt;</span> <span class="dt">Free</span> f a</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>liftF f <span class="ot">=</span> <span class="dt">Free</span> (<span class="fu">fmap</span> <span class="dt">Pure</span> f)</span></code></pre></div>
+<p>Now, monad in hand, it becomes ease itself to create sub programs. We can even define convenience functions for each of our steps, for instance:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ot">play ::</span> <span class="dt">Song</span> <span class="ot">-&gt;</span> <span class="dt">Free</span> (<span class="dt">Playlist</span> <span class="dt">Song</span>) ()</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>play s <span class="ot">=</span> <span class="dt">Free</span> (<span class="dt">Play</span> s (<span class="dt">Pure</span> ())</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="ot">done ::</span> <span class="dt">Free</span> (<span class="dt">Playlist</span> a) ()</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>done <span class="ot">=</span> <span class="dt">Free</span> <span class="dt">Done</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- ...</span></span></code></pre></div>
+<p>Or even simpler, we can use the Free functor <code>liftF</code></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ot">pause ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Free</span> (<span class="dt">Playlist</span> a) ()</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>pause <span class="ot">=</span> liftF <span class="op">.</span> <span class="dt">Pause</span></span></code></pre></div>
+<p>This gives us quite an easy way to write our playlists:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ot">oneHitWonders ::</span> <span class="dt">Free</span> (<span class="dt">Playlist</span> <span class="dt">Song</span>) ()</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>oneHitWonders <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    play (<span class="dt">Song</span> <span class="st">&quot;Len&quot;</span> <span class="st">&quot;Steal My Sunshine&quot;</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    play (<span class="dt">Song</span> <span class="st">&quot;Mungo Jerry&quot;</span> <span class="st">&quot;In The Summertime&quot;</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    pause <span class="dv">4</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    play (<span class="dt">Song</span> <span class="st">&quot;A Flock of Seaguls&quot;</span> <span class="st">&quot;I Ran (So Far Away)&quot;</span>)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    done</span></code></pre></div>
+<p>The only thing left to do is interpret what we’ve done and maybe play our songs in the real world.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ot">interpret ::</span> <span class="dt">Free</span> (<span class="dt">Playlist</span> <span class="dt">Song</span>) a <span class="ot">-&gt;</span> <span class="dt">IO</span> a</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>interpret (<span class="dt">Free</span> (<span class="dt">Play</span> s next)) <span class="ot">=</span> playIO s <span class="op">&gt;&gt;</span> interpret next</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>interpret (<span class="dt">Free</span> (<span class="dt">Pause</span> n next)) <span class="ot">=</span> pauseIO n <span class="op">&gt;&gt;</span> interpret next</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>interpret (<span class="dt">Free</span> <span class="dt">Done</span>) <span class="ot">=</span> <span class="fu">return</span> ()</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>interpret <span class="dt">Pure</span> r <span class="ot">=</span> <span class="fu">return</span> r</span></code></pre></div>
+<p>However, this is a little bit tedious, fortunately there exists an existing pattern that is applicable, <em>folding</em>. We can define a function for generic interpretation as</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ot">foldFree ::</span> (<span class="dt">Functor</span> f, <span class="dt">Monad</span> m) <span class="ot">=&gt;</span> (<span class="kw">forall</span> a<span class="op">.</span> f a <span class="ot">-&gt;</span> m a) <span class="ot">-&gt;</span> <span class="dt">Free</span> f a <span class="ot">-&gt;</span> m a</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>foldFree _ (<span class="dt">Done</span> a) <span class="ot">=</span> <span class="fu">return</span> a</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>foldFree interpret (<span class="dt">Free</span> f) <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    a <span class="ot">&lt;-</span> interpret f</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    foldFree interpret a</span></code></pre></div>
+<h2 id="putting-it-into-practice">Putting It Into Practice</h2>
+<p>So, what’s all the buzz about? After all being able to interpret a dsl is hardly newsworthy, I mean, how is it useful? Well the joy of Free monads is that they abstract a program away from the manner in which it is used. For instance, consider writing a standard web application, you might have a database connection wrapped around IO, as well as a logger, and countless other things. We tend to write this as a large monad stack.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">App</span> a <span class="ot">=</span> <span class="dt">App</span> {<span class="ot"> runApp ::</span> <span class="dt">ReaderT</span> <span class="dt">DBConn</span> <span class="dt">IO</span> a }</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">deriving</span> (<span class="dt">Functor</span>, <span class="dt">Monad</span>, <span class="dt">MonadReader</span> <span class="dt">DBConn</span>) <span class="op">--..</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="ot">getUsers ::</span> <span class="dt">App</span> [<span class="dt">User</span>]</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>getUsers <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    conn <span class="ot">&lt;-</span> ask</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    liftIO <span class="op">$</span> runDB conn [sql|SELECT * FROM users]</span></code></pre></div>
+<p>The problem with this, or rather the unfortunate thing, is the reliance on IO. The logic of the application is entirely bound up in the IO of the application. There is no way of testing it without a live database connection, and the performance of actual IO.</p>
+<p>Amazingly however, we can accomplish the same functionality with <code>Free</code> monads. The idea here is to abstract away operations that could require IO as commands, that we can interpret in whatever way we might choose later on. For instance we might define</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">AppFunctionality</span> next <span class="ot">=</span> <span class="dt">GetUsers</span> ([<span class="dt">User</span>] <span class="ot">-&gt;</span> next) <span class="op">|</span> <span class="dt">LogStr</span> <span class="dt">Text</span> next</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">deriving</span> (<span class="dt">Functor</span>)</span></code></pre></div>
+<p>We can then rebuild our application using an interpreter</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">App</span> <span class="ot">=</span> <span class="dt">Free</span> <span class="dt">AppFunctionality</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="ot">getUsers ::</span> <span class="dt">App</span> [<span class="dt">User</span>]</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>getUsers <span class="ot">=</span> liftF <span class="dt">GetUsers</span></span></code></pre></div>
+<p>Here <code>getUsers</code> is effectively lifting some future <code>[Users]</code> type into <code>Done</code>, if we expand out <code>liftF</code> it is slightly more clear.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>getUsers <span class="ot">=</span> <span class="dt">Free</span> (<span class="dt">GetUsers</span> <span class="dt">Done</span>)</span></code></pre></div>
+<p>Likewise we can define a logging function</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">log</span><span class="ot"> ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">App</span> ()</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">log</span> <span class="ot">=</span> liftF <span class="op">.</span> <span class="dt">LogStr</span></span></code></pre></div>
+<p>Notably, adding context or capability to our application is as easy as defining new commands, and no where in this process have we touched IO. Our program could as easily run against predefined inputs as against a live database. Indeed for testing purposes it’s often useful to set up something like that:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="ot">interpretTest ::</span> <span class="dt">App</span> a <span class="ot">-&gt;</span> <span class="dt">Writer</span> [<span class="dt">Text</span>] a</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>interpretTest <span class="ot">=</span> foldFree nat</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">where</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="ot">        nat ::</span> <span class="dt">AppFunctionality</span> a <span class="ot">-&gt;</span> <span class="dt">Writer</span> [<span class="dt">Text</span>] a</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>        nat (<span class="dt">GetUsers</span> f) <span class="ot">=</span> <span class="fu">return</span> <span class="op">$</span> f [<span class="dt">User</span> <span class="st">&quot;Bob&quot;</span>, <span class="dt">User</span> <span class="st">&quot;Alice&quot;</span>]  <span class="co">-- ...</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>        nat (<span class="dt">LogStr</span> str next ) <span class="ot">=</span> tell str <span class="op">&gt;&gt;</span> <span class="fu">pure</span> next</span></code></pre></div>
+<p>However it’s easy to see that we can just as easily use <code>IO</code> instead, so that the entire logic of our program is independent of the way it accesses the outside world, i.e. the edge case. In this way free monads allow us to write pure programs that can be run in a manner as to avoid or create side affects according to what is needed.</p>
+<p>However, it’s worth noting that the free monad is no different than any other free construction, it allows a functor to act as a Monad and uses the underlying interpretation of the functor to interpret a monadic computation.</p>
+<hr />
+<section class="footnotes" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1" role="doc-endnote"><p>In Haskell <code>Free</code> is specific to the elevation of a <em>Functor</em> to a <em>Monad</em>, and hence there is no qualification of it’s name. This can be confusing as in Mathematics a free object refers to the universal property and exists for any algebraic structure.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+  </section>
+</article>
+
+      </main>
+
+    <footer class="page-footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </footer>
+
+    </div>
+
+
+    <!-- The Most Minimalist Javascript -->
+    <script src="../../js/the.js"></script>
+
+  </body>
+</html>

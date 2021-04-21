@@ -22,8 +22,12 @@ function swapDarkLight() {
   }
 }
 
+function getColorTheme() {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
 // Restore theme from session
-setColorTheme(window.localStorage.getItem('color-theme'));
+setColorTheme(getColorTheme());
 
 // JS might not be enabled, if so we might want to hide the toggle.
 document.body.classList.add('js');

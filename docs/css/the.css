@@ -206,6 +206,7 @@ pre {
 
   pre.sourceCode {
     width: fit-content;
+    min-width: calc(var(--content-width) - var(--content-padding) * 2);
   }
 }
 
@@ -290,13 +291,14 @@ footer {
 .js .dark-mode {
   display: block;
   margin: 0;
-  padding: 0.2rem;
   position: absolute;
   top: 0;
   left: 1rem;
   background-color: var(--color-theme-toggle);
   color: var(--color-background);
   border: none;
+  padding: 0.6rem;
+  cursor: pointer;
 }
 
 .postlist {
