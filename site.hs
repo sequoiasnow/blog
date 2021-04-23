@@ -122,6 +122,10 @@ main = hakyllWith config $ do
 
   faviconsRules "images/favicon.svg"
 
+  match "CNAME" $ do
+    route   idRoute
+    compile copyFileCompiler
+
   -- Copy images over
   match "images/**/*" $ do
     route   idRoute
