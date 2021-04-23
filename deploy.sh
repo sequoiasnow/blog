@@ -12,4 +12,4 @@ git add -A
 git commit -m "Publish."
 
 # Push
-git push origin develop:develop
+git push 
