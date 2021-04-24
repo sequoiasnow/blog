@@ -401,7 +401,7 @@ according to what is needed.
 
 However, it's worth noting that the free monad is no different than any other
 free construction, it allows a functor to act as a Monad and uses the underlying
-interpretation of the functor to interpret a monadic computation.
+interpretation of the functor to interpret a monadic computation.gg
 
 ---
 

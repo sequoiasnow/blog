@@ -204,7 +204,7 @@
 <span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>        nat (<span class="dt">GetUsers</span> f) <span class="ot">=</span> <span class="fu">return</span> <span class="op">$</span> f [<span class="dt">User</span> <span class="st">&quot;Bob&quot;</span>, <span class="dt">User</span> <span class="st">&quot;Alice&quot;</span>]  <span class="co">-- ...</span></span>
 <span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>        nat (<span class="dt">LogStr</span> str next ) <span class="ot">=</span> tell str <span class="op">&gt;&gt;</span> <span class="fu">pure</span> next</span></code></pre></div>
 <p>However it’s easy to see that we can just as easily use <code>IO</code> instead, so that the entire logic of our program is independent of the way it accesses the outside world, i.e. the edge case. In this way free monads allow us to write pure programs that can be run in a manner as to avoid or create side affects according to what is needed.</p>
-<p>However, it’s worth noting that the free monad is no different than any other free construction, it allows a functor to act as a Monad and uses the underlying interpretation of the functor to interpret a monadic computation.</p>
+<p>However, it’s worth noting that the free monad is no different than any other free construction, it allows a functor to act as a Monad and uses the underlying interpretation of the functor to interpret a monadic computation.gg</p>
 <hr />
 <section class="footnotes" role="doc-endnotes">
 <hr />
