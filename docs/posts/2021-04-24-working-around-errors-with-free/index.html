@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thoughts! - - Working Around Errors With Free</title>
+    <link rel="stylesheet" href="../../css/the.css" />
+
+    <!-- FavIcon  -->
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"><link rel="shortcut icon" href="../../images/favicons/favicon32.png"><link rel="apple-touch-icon-precomposed" sizes="144x144" href="../../images/favicons/favicon144.png"><link rel="apple-touch-icon-precomposed" sizes="114x114" href="../../images/favicons/favicon114.png"><link rel="apple-touch-icon-precomposed" sizes="72x72" href="../../images/favicons/favicon72.png"><link rel="apple-touch-icon-precomposed" sizes="57x57" href="../../images/favicons/favicon57.png">
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.css" integrity="sha384-Cqd8ihRLum0CCg8rz0hYKPoLZ3uw+gES2rXQXycqnL5pgVQIflxAUDS7ZSjITLb5" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.js" integrity="sha384-1Or6BdeNQb0ezrmtGeqQHFpppNd7a/gw29xeiSikBbsb44xu3uAo8c7FwbF5jhbd" crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+  </head>
+  <body>
+    <button class="dark-mode" onClick="swapDarkLight();">
+      Dark Mode
+    </button>
+    <div class="wrapper">
+      <nav>
+        <ul>
+          <li class="nav__title">
+            <a href="../../">Thoughts<span class="factorial">!</span></a>
+          </li>
+          <li class="nav__pages">
+            <ul>
+              <li><a href="../../">Home</a></li>
+              <li><a href="../../about/">About</a></li>
+              <li><a href="../../contact/">Contact</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <main role="main" class="content">
+        <article class="post">
+  <section class="post__header">
+    <h1 class="post__title">Working Around Errors With Free</h1>
+  </section>
+  <section class="post__body">
+    <p>In the course of writing most any program your liable to run into two main categories of errors. Those caused by forces within your control, and those caused by forces without.</p>
+<h2 id="the-unavoidable">The Unavoidable</h2>
+<p>These are things outside of your control, dropped database connections, improperly configured configuration files, etc… Each of these is by nature a permanent failure since there is no effective way for the application to recover the lost functionality. As such these are the errors that tend to cause a program to fail, and now handling can prevent.</p>
+<h2 id="the-recoverable">The Recoverable</h2>
+<p>Then there are the logical errors which are introduced by edge-cases in your own programs logic. For instance, the accidental deletion of a user during an active session, causing an expected resource to be unavailable. While these errors could be solved by simply bubbling up an error, they are also in some manner avoidable - they must be, since they are in some manner caused by the programs logic.</p>
+<hr />
+<p>Recoverable errors are much more favorable than unavoidable errors for the simple reason that they allow us to extend functionality rather than limit it. For instance, consider the following (rather contrived) example of a user attempting to like a message that has been deleted by another user. We could simply throw an exception,</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">likeMessage ::</span> (<span class="dt">MonadThrow</span> m, <span class="dt">Queryable</span> m) <span class="ot">=&gt;</span> <span class="dt">MessageId</span> <span class="ot">-&gt;</span> m <span class="dt">Message</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>likeMessage mId <span class="ot">=</span> <span class="fu">either</span> throwError <span class="fu">id</span> <span class="op">$</span> runDb <span class="op">...</span></span></code></pre></div>
+<p>but this limits our user’s information about what has happened. Instead, we can add in functionality through actively handling our error. Not only does this improve our user’s experience, but also informs the type of our function. It’s potential failure is now entirely obvious:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">ModifyMessageErr</span> <span class="ot">=</span> <span class="dt">ErrMessageDeleted</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ot">likeMessage ::</span> (<span class="dt">Queryable</span> m) <span class="ot">=&gt;</span> <span class="dt">MessageId</span> <span class="ot">-&gt;</span> m (<span class="dt">Either</span> <span class="dt">ModifyMessageErr</span> <span class="dt">Message</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>likeMessage mId <span class="ot">=</span> <span class="fu">either</span> (<span class="fu">const</span> <span class="dt">ErrMessageDeleted</span>) <span class="fu">id</span> <span class="op">$</span> runDb <span class="op">...</span></span></code></pre></div>
+<p>Moreover, if other potential failure points exist we can extend the <code>ModifyMessageErr</code> type as appropriate. Seemingly we have eliminated the potential for an unexpected halt introduced by <code>MonadThrow</code>, but have we?</p>
+<blockquote>
+<p>Our current recoverable error handling has some issues as well, namely it simply bubbles up the responsibility using Either instead of <code>throwError</code>. Fortunately both of these problems have a similar solution.</p>
+</blockquote>
+<p>See although we have no introduced some, incredibly basic, handling for a <em>recoverable</em> error, the use of <code>runDb</code> is inherently <code>IO</code> based - the database is after all an external concern. Therefore, it too has the potential to fail, and hence it’s easy to see that <code>MonadIO m =&gt; Queryable m</code>. Ideally, we would write our program, free of worry as to the condition of the database or our message. But how do we do this?</p>
+<h2 id="pushing-back-responsibility">Pushing Back Responsibility</h2>
+<p>Consider what our function most basically needs to do, operate in some manner on a message object. It doesn’t actually need to do know the message <code>id</code> since it is only working on the object itself. We can encapsulate that functionality and pass it directly to the function, thus freeing <code>likeMessage</code> from any responsibility other than the logic of incrementing the message.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">likeMessage ::</span> <span class="dt">Message</span> <span class="ot">-&gt;</span> <span class="dt">Message</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>likeMessage m <span class="ot">=</span> m { messageLikes <span class="ot">=</span> messageLikes m <span class="op">+</span> <span class="dv">1</span> }</span></code></pre></div>
+<p>However, <code>likeMessage</code> can no longer access the database, that responsibility, is now pushed back. Eventually however, there must exist some function, to perform the actual work…</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">modifyMessage ::</span> <span class="dt">MessageId</span> <span class="ot">-&gt;</span> (<span class="dt">Message</span> <span class="ot">-&gt;</span> <span class="dt">Message</span>) <span class="ot">-&gt;</span> m <span class="dt">Message</span></span></code></pre></div>
+<p>Now, on first glance, this function <strong>must</strong> use <code>IO</code>, and we find ourselves again in the hole we dug in the first place with the <code>Queryable</code> typeclass. However, we have a trick up our sleeve, <a href="../../posts/2021-04-20-extending-functionality-with-free/">the <code>Free</code> monad</a>. Suppose instead of defining <code>modifyMessage</code> as a function, we define it as a command,</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">QueryCmd</span> next <span class="ot">=</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">ModifyMessage</span> <span class="dt">MessageId</span> (<span class="dt">Message</span> <span class="ot">-&gt;</span> <span class="dt">Message</span>) (<span class="dt">Maybe</span> <span class="dt">Message</span> <span class="ot">-&gt;</span> next)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> <span class="dt">QueryCmd</span> <span class="kw">where</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fmap</span> f (<span class="dt">ModifyMessage</span> mId modify getMsg) <span class="ot">=</span> <span class="dt">ModifyMessage</span> mId modify (f <span class="op">.</span> getMessage)</span></code></pre></div>
+<p>We can now declare a <code>Free</code> monad which allows us to build up a chain of these commands, without ever running them.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">QueryM</span> <span class="ot">=</span> <span class="dt">Free</span> <span class="dt">QueryCmd</span></span></code></pre></div>
+<p>We can now define <code>modifyMessage</code> in the context of our <code>Free</code> Monad.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">modifyMessage ::</span> <span class="dt">MessageId</span> <span class="ot">-&gt;</span> (<span class="dt">Message</span> <span class="ot">-&gt;</span> <span class="dt">Message</span>) <span class="ot">-&gt;</span> <span class="dt">QueryM</span> (<span class="dt">Maybe</span> <span class="dt">Message</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>modifyMessage mId modify <span class="ot">=</span> liftF <span class="op">$</span> <span class="dt">ModifyMessage</span> mId modify <span class="fu">id</span></span></code></pre></div>
+<p>The trick here, is the function <code>liftF</code> which as the function suggests, lifts our command to the Free monad.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ot">liftF ::</span> (<span class="dt">Functor</span> f) <span class="ot">=&gt;</span> f a <span class="ot">-&gt;</span> <span class="dt">Free</span> f a</span></code></pre></div>
+<p>The logic here is actually pretty simple, the <code>Free</code> monad acts as a wrapper which extends the functionality of a functor, <code>Free f a = Free (f (Free f r)) | Pure r</code>, and the <code>liftF</code> function simply places a functor <code>f a</code> into the chain,</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>liftF f <span class="ot">=</span> <span class="dt">Free</span> (<span class="fu">fmap</span> <span class="dt">Pure</span> f)</span></code></pre></div>
+<p>Even if the innards of this transformation seem confusing the end result is quite simple to work with, we can transform a functor into a Monad, i.e. <code>modifyMessage</code>. We can then create an interpreter for <code>QueryM</code> that is independent of backend implementation. For instance, if we wanted some really basic testing we could use some predetermined values.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ot">run ::</span> <span class="dt">QueryM</span> a <span class="ot">-&gt;</span> <span class="dt">State</span> [(<span class="dt">MessageId</span>, <span class="dt">Message</span>)] a</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>run (<span class="dt">Free</span> (<span class="dt">ModifyMessage</span> mId updateMessage getMessage)) <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    message <span class="ot">&lt;-</span> gets (<span class="fu">lookup</span> mId)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- If we found the message modify it</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    forM_ message <span class="op">$</span> \ m <span class="ot">-&gt;</span> modify (insert mId <span class="op">$</span> updateMessage m)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- run next</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    run (getMessage message)</span></code></pre></div>
+<p>Now, let’s look at what’s going on here. In this case we are transforming our <code>QueryM</code> monad (which is effectively a chain of <code>QueryCmd</code>s) into a <code>State</code> monad. The logic of our program is now entirely pure, and we can easily create another transformer to <code>IO</code> using <code>runDb</code>, but crucially not part of the application logic is at risk from <em>any unavoidable errors</em> since by construction all sideaffectful code is contained within the <code>run</code> function. Not only is the <code>run</code> code now explicitly responsible for all external errors, but it can also determine the manner in which we wish to handle internal conflicts with that external conflict. For instance our current definition of <code>ModifyMessage</code> includes a <code>Maybe Message</code> indicating that the given message might not exist to be modified. However, had we defined it as simply <code>Message</code> the responsibility of finding such a message, or throwing and error would be pushed to the interpreter of the <code>QueryM</code> monad. We might wish to always error in such an event, create a new message, or whichever - but crucially the responsibility for maintaining database consistency now lies with the backend we choose to run our program rather than the programs logic itself.</p>
+<p>This is the real benefit of <code>Free</code> monads, or similar programs like <a href="https://hackage.haskell.org/package/MonadPrompt">monad-prompt</a>, namely by the choice of commands we effectively separate concerns between the logic of the application and the resolving of inconsistencies with external resources, files, databases, etc.. By making our program execution agnostic we gain fine grained control over exactly which errors should be acceptable and handleable and which are unavoidable and should be the responsibility of the relevant runner.</p>
+  </section>
+</article>
+
+      </main>
+
+    <footer class="page-footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </footer>
+
+    </div>
+
+
+    <!-- The Most Minimalist Javascript -->
+    <script src="../../js/the.js"></script>
+
+  </body>
+</html>
