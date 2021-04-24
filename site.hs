@@ -151,7 +151,7 @@ main = hakyllWith config $ do
     compile copyFileCompiler
 
   -- Create an about/contact page
-  match (fromList ["about.md", "contact.markdown"]) $ do
+  match (fromList ["about.md", "contact.md"]) $ do
     route   $ cleanRoute
     compile $ pandocMathCompiler
         >>= loadAndApplyTemplate "templates/default.html" baseContext
