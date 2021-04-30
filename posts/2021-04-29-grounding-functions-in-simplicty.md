@@ -1,4 +1,3 @@
-
 ---
 title: Grounding Functions in Simplicity
 tags: electricity, programming, minimalism
