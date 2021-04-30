@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thoughts! - - Headers & Servant</title>
+    <link rel="stylesheet" href="../../css/the.css" />
+
+    <!-- FavIcon  -->
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"><link rel="shortcut icon" href="../../images/favicons/favicon32.png"><link rel="apple-touch-icon-precomposed" sizes="144x144" href="../../images/favicons/favicon144.png"><link rel="apple-touch-icon-precomposed" sizes="114x114" href="../../images/favicons/favicon114.png"><link rel="apple-touch-icon-precomposed" sizes="72x72" href="../../images/favicons/favicon72.png"><link rel="apple-touch-icon-precomposed" sizes="57x57" href="../../images/favicons/favicon57.png">
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.css" integrity="sha384-Cqd8ihRLum0CCg8rz0hYKPoLZ3uw+gES2rXQXycqnL5pgVQIflxAUDS7ZSjITLb5" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.js" integrity="sha384-1Or6BdeNQb0ezrmtGeqQHFpppNd7a/gw29xeiSikBbsb44xu3uAo8c7FwbF5jhbd" crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+  </head>
+  <body>
+    <button class="dark-mode" onClick="swapDarkLight();">
+      Dark Mode
+    </button>
+    <div class="wrapper">
+      <nav>
+        <ul>
+          <li class="nav__title">
+            <a href="../../">Thoughts<span class="factorial">!</span></a>
+          </li>
+          <li class="nav__pages">
+            <ul>
+              <li><a href="../../">Home</a></li>
+              <li><a href="../../about/">About</a></li>
+              <li><a href="../../contact/">Contact</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <main role="main" class="content">
+        <article class="post">
+  <section class="post__header">
+    <h1 class="post__title">Headers & Servant</h1>
+  </section>
+  <section class="post__body">
+    <p>Although by it’s very nature Servant’s types give us an excellent indication of what routes are doing, it can at times be tricky to try and interact with. Particularly in the case of Headers, where competing approaches from <a href="https://hackage.haskell.org/package/servant-auth">servant-auth</a> muddle the waters with Servant’s inherent definitions.</p>
+<p>Fortunately, though it does require some digging, all information necessary is provided by the Servant type system. Let’s start by looking at the definition of a header as provided by Servant.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Header'</span> (<span class="ot">mods ::</span> [<span class="op">*</span>]) (<span class="ot">sym ::</span> <span class="dt">Symbol</span>) (<span class="ot">a ::</span> <span class="op">*</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">Header</span> <span class="ot">=</span> <span class="dt">Header'</span> '[<span class="dt">Optional</span>, <span class="dt">Strict</span>]</span></code></pre></div>
+<p>As we can see, Servant provides two types. By default a <code>Header</code> is optional and can <code>Strict</code>, which is to say it’s contents must be acceptably parsed via <code>FromHttpApiData</code>. However, as we can see it’s also possible to specify other combinators for a <code>Header</code>, for instance making it <code>Required</code>. Then we come to the rest of the signature <code>sym :: Symbol</code> indicates the name of the <code>Header</code>, for instance <code>Authorization</code> and <code>a :: *</code> is the type of Header’s contents.</p>
+<p>Let’s lookup a few examples and see how changing the <code>Header</code>s affects our handling functions</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Parse the &quot;X-Example&quot; header as Text, will run even if not present.</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">APIExample1</span> <span class="ot">=</span>  <span class="dt">Header</span> <span class="st">&quot;X-Example&quot;</span> <span class="dt">Text</span> <span class="op">:&gt;</span> <span class="dt">Get</span> '[<span class="dt">JSON</span>] <span class="dt">JSON</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ot">example1 ::</span> <span class="dt">Server</span> <span class="dt">APIExample1</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>example1 <span class="ot">=</span> handler</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">where</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ot">        handler ::</span> <span class="dt">Maybe</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Object</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        handler <span class="ot">=</span> <span class="fu">undefined</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">-- Require the &quot;X-Example&quot; header to be parsed as Text</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">APIExample2</span> <span class="ot">=</span>  <span class="dt">Header'</span> '[<span class="dt">Required</span>, <span class="dt">Strict</span>] <span class="st">&quot;X-Example&quot;</span> <span class="dt">Text</span> <span class="op">:&gt;</span> <span class="dt">Get</span> '[<span class="dt">JSON</span>] <span class="dt">JSON</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="ot">example2 ::</span> <span class="dt">Server</span> <span class="dt">APIExample1</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>example2 <span class="ot">=</span> handler</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">where</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="ot">        handler ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Object</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        handler <span class="ot">=</span> <span class="fu">undefined</span></span></code></pre></div>
+<p>So far we’ve been looking at the request side of Headers, which is pretty simple to parse, however, on the request side things get a bit more difficult. Now from a type perspective things remain rather simple, an endpoint which set’s the <code>X-Example</code> header can be described in an obvious way.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">APIExample3</span><span class="ot"> ::</span> <span class="dt">Get</span> '[<span class="dt">JSON</span>] (<span class="dt">Headers</span> '[<span class="dt">Header</span> <span class="st">&quot;X-Example&quot;</span> <span class="dt">Text</span>] <span class="dt">JSON</span>)</span></code></pre></div>
+<p>However, things get a bit more complicated when it comes to actually setting the Header in our server. The documentation of <code>Servant.API.ResponseHeaders</code> is somewhat confusing since the larger part of it deals with presenting response headers in a type safe way using a heterogeneous list. Consider the <code>addHeader</code> function. It seemingly does what we want but it’s type is a bit ambiguous.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">addHeader ::</span> <span class="dt">AddHeader</span> h v orig new <span class="ot">=&gt;</span> v <span class="ot">-&gt;</span> orig <span class="ot">-&gt;</span> new</span></code></pre></div>
+<p>If we examine the <code>AddHeader</code> class things don’t become any clearer, in fact the larger part of the definition of the class is dedicated to specifying the <a href="https://wiki.haskell.org/Functional_dependencies">Functional Dependencies</a> which ensure that we don’t get improper type overlaps. However, when we come to the instances we see something interesting.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="ot">{-# OVERLAPPING #-}</span> ( <span class="dt">KnownSymbol</span> h, <span class="dt">ToHttpApiData</span> v )</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>         <span class="ot">=&gt;</span> <span class="dt">AddHeader</span> h v (<span class="dt">Headers</span> (<span class="fu">fst</span> '<span class="op">:</span> rest)  a) (<span class="dt">Headers</span> (<span class="dt">Header</span> h v  '<span class="op">:</span> <span class="fu">fst</span> '<span class="op">:</span> rest) a) <span class="kw">where</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    addOptionalHeader hdr (<span class="dt">Headers</span> resp heads) <span class="ot">=</span> <span class="dt">Headers</span> resp (<span class="dt">HCons</span> hdr heads)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="ot">{-# OVERLAPPABLE #-}</span> ( <span class="dt">KnownSymbol</span> h, <span class="dt">ToHttpApiData</span> v</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>                       , new <span class="op">~</span> (<span class="dt">Headers</span> '[<span class="dt">Header</span> h v] a) )</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>         <span class="ot">=&gt;</span> <span class="dt">AddHeader</span> h v a new <span class="kw">where</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    addOptionalHeader hdr resp <span class="ot">=</span> <span class="dt">Headers</span> resp (<span class="dt">HCons</span> hdr <span class="dt">HNil</span>)</span></code></pre></div>
+  </section>
+</article>
+
+      </main>
+
+    <footer class="page-footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </footer>
+
+    </div>
+
+
+    <!-- The Most Minimalist Javascript -->
+    <script src="../../js/the.js"></script>
+
+  </body>
+</html>

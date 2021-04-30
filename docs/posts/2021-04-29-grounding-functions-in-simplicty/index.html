@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thoughts! - - 2021-04-29-grounding-functions-in-simplicty</title>
+    <link rel="stylesheet" href="../../css/the.css" />
+
+    <!-- FavIcon  -->
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"><link rel="shortcut icon" href="../../images/favicons/favicon32.png"><link rel="apple-touch-icon-precomposed" sizes="144x144" href="../../images/favicons/favicon144.png"><link rel="apple-touch-icon-precomposed" sizes="114x114" href="../../images/favicons/favicon114.png"><link rel="apple-touch-icon-precomposed" sizes="72x72" href="../../images/favicons/favicon72.png"><link rel="apple-touch-icon-precomposed" sizes="57x57" href="../../images/favicons/favicon57.png">
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.css" integrity="sha384-Cqd8ihRLum0CCg8rz0hYKPoLZ3uw+gES2rXQXycqnL5pgVQIflxAUDS7ZSjITLb5" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.js" integrity="sha384-1Or6BdeNQb0ezrmtGeqQHFpppNd7a/gw29xeiSikBbsb44xu3uAo8c7FwbF5jhbd" crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+  </head>
+  <body>
+    <button class="dark-mode" onClick="swapDarkLight();">
+      Dark Mode
+    </button>
+    <div class="wrapper">
+      <nav>
+        <ul>
+          <li class="nav__title">
+            <a href="../../">Thoughts<span class="factorial">!</span></a>
+          </li>
+          <li class="nav__pages">
+            <ul>
+              <li><a href="../../">Home</a></li>
+              <li><a href="../../about/">About</a></li>
+              <li><a href="../../contact/">Contact</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <main role="main" class="content">
+        <article class="post">
+  <section class="post__header">
+    <h1 class="post__title">2021-04-29-grounding-functions-in-simplicty</h1>
+  </section>
+  <section class="post__body">
+    <p>Recently I’ve had the privilege (also known as the mix of free time and a desire to try new ways of getting money) to work a few days as an electrician. There are several interesting things about this work, but one in particular has stood out to me: the design of the ground wire.</p>
+<p>Now in the design of any home, one thing to avoid is it’s potential destruction through an electrical fault. If a rat were to chew through a wire, or as is all the more likely in the bay, an earthquake destroy a cable, it would be highly undesirable for the resulting short to burn through wood and cause a fire, or electrocute someone opening the bridge say. To prevent this, most circuits come equipped with a ground wire, that is a wire that at some point is grounded in the Earth, which is such a large body that any unexpected discharge of electron in a grounded system would follow that wire back to Earth and be sucked back to harmless neutrality.</p>
+<p>Now this is a reasonably simple concept, but there is the question of how to convey information about a circuit in a consistent manner. By custom, the “hot” wire, that is the wire of negative potential is colored black or red, and the “neutral” wire of more positive potential which receives the influx of electrons is marked as white. This makes a kind of sense, particularly as white is considered a base color in paintings, it’s analog as neutral in electrical systems is obvious to anyone attempting to guess the nature of the given wire. However, how are we to indicate ground?</p>
+<p>One approach would be to paint the wire <strong>g</strong>reen in reference to <strong>g</strong>round, but this might be confusing - after all none of the other wires are labeled according to mnemonic devices. In actual fact, the ground wire is indicated instead by it’s purpose. Because it is the <em>ground</em> wire, it is the only wire which can always be touched without danger. Hence leaving the wire bare, instead of covered makes it’s purpose immediate and obvious. It’s function details it’s purpose.</p>
+<hr />
+<p>It seems to me that this notion of obvious functionality informing identity is of paramount importance in creating a maintainable code infrastructure. If we design a function with as minimal a set of input output parameters as are <em>functionally</em> necessary the nature of it’s function becomes obvious without our needing to name it descriptively. It is so plain in it’s type signature that we have no doubts about it’s purpose or action.</p>
+<p>Such signatures are eminent in simple functional code, consider the following examples</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">x ::</span> <span class="dt">NonEmpty</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ot">y ::</span> (<span class="dt">KnownNat</span> n, <span class="dt">CmpNat</span> i n <span class="op">~</span> <span class="dt">LT</span>) <span class="ot">=&gt;</span> proxy i <span class="ot">-&gt;</span> <span class="dt">Vector</span> n a <span class="ot">-&gt;</span> a</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ot">z ::</span> (<span class="dt">Z</span> f) <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> (c <span class="ot">-&gt;</span> d) <span class="ot">-&gt;</span> f a c <span class="ot">-&gt;</span> f b d</span></code></pre></div>
+<p>Although there exists <em>some</em> ambiguity, the explicitly functional type signature gives an excellent indication of what each function does. The function <code>x</code> either takes the first or last element of a <code>NonEmpty</code> list. Since the only input given, <code>NonEmpty a</code> is guaranteed only to have at least one element, it has either a <code>head</code> or a <code>tail</code>, no other element can be guaranteed to exist. Hence, since we always receive an <code>a</code> from the function it must be one of these two. Were we to have written <code>NonEmpty a -&gt; Maybe a</code> the ambiguity becomes much larger, since theoretically we could be operating on a potentially nonexistent element, such as the third of a list. By keeping the type small, we have narrowed it down to exactly two possibilities.</p>
+<p>The function <code>y</code> quite obviously takes the <code>i</code>th element of a vector with strongly typed length <code>n</code> where <code>n &gt; i</code>. Again, no other possibility is permitted by the type signature, since we know nothing about <code>n</code> other than that it is greater than <code>i</code>, we do not even know if <code>n</code> is nonzero, the only possible value our code can retrieve is the <code>i</code>th index. The type signature completely determines the nature of the functions implementation.</p>
+<p>Lastly <code>z</code> clearly takes a data type of kind <code>f :: * -&gt; * -&gt; *</code> and maps the first and second parameter. Indeed, this is simply the <code>bimap</code> function from prelude, but it is also eminently obvious what the <code>Z</code> constraint must indicate.</p>
+<h3 id="in-practice">In Practice</h3>
+<p>Now this is all well and good, and the prelude is littered with such examples of minimal type signatures. It’s why <a href="hoogle.com">hoogle</a> works and it’s one of the great joys of writing Haskell programs. The problem is, that such attention is rarely given to internal functions pithing a function. It is all to common to write a function,</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">validateUser ::</span> <span class="dt">User</span> <span class="ot">-&gt;</span> <span class="dt">App</span> (<span class="dt">Maybe</span> <span class="dt">UserRegistrationErr</span>)</span></code></pre></div>
+<p>which, while clear in it’s intended usage, is utterly opaque in the manner of it’s function. Does it access the database? Does it look at a list of common passwords? Does it do nothing at all, it’s nigh on impossible to tell since the type signature is so ambiguous.</p>
+<p>We can improve the situation somewhat by introducing constraints instead of using the nebulous <code>App</code> construct,</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validateUser</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    ::</span> ( <span class="dt">Monad</span> m</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>       , <span class="dt">MonadIO</span> m</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>       , <span class="dt">Has</span> <span class="dt">HttpClient</span> r</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>       , <span class="dt">Has</span> <span class="dt">DBConnection</span> r</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>       , <span class="dt">MonadReader</span> r m )</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="ot">=&gt;</span> <span class="dt">User</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="ot">-&gt;</span> <span class="dt">App</span> (<span class="dt">Maybe</span> <span class="dt">UserRegistrationErr</span>)</span></code></pre></div>
+<p>This makes it somewhat more clear what resources our code will use in order to validate the user, but it does not clarify exactly what shall be validated, or how. Are we performing checks of username length, or just uniqueness, are we looking at email validation or just leaving that field be? The problem, of course, is that this type of code is convenient, and, of course, we can always read through the documentation to find out what’s going on. But, that documentation might not always be there, or up-to-date, and when the function does fail, it’s entirely difficult to figure out at what stage it failed. Certainly the implementation of our function is not obvious from the type signature alone, but could we perhaps make it so?</p>
+<p>Consider an alternative, turning the function around, we can make explicit which parameters are being checked.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validateUser</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    ::</span> ( <span class="dt">Monad</span> m</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>       , <span class="dt">MonadIO</span> m</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>       , <span class="dt">Has</span> <span class="dt">HttpClient</span> r</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>       , <span class="dt">Has</span> <span class="dt">DBConnection</span> r</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>       , <span class="dt">MonadReader</span> r m )</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="ot">=&gt;</span> <span class="dt">UserRegistrationErr</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="ot">-&gt;</span> <span class="dt">User</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="ot">-&gt;</span> m <span class="dt">Bool</span></span></code></pre></div>
+<p>Writing the function in this manner, it’s explicit which potential error we are testing against. Although there is still ambiguity as to the manner of each test, it has become entirely explicit what exactly we are testing, and the resulting type <code>m Bool</code> is no longer ambiguous, the test has passed or it has not.</p>
+<p>Of course, this isn’t perfect. Doubtless there are many ways to improve upon the function, we could establish explicit checks for each field in the user record and expose it only upon completion of those checks, use heterogeneous types to make the kinds of errors explicit, etc… However, the incremental improvement towards code with obvious functionality is important. Not only does it ease library maintenance by making a functions purpose and behavior obvious from the type signature, but by thus constraining the potential implementation of a function, we also constrain the potential for an unforeseen error therein.</p>
+  </section>
+</article>
+
+      </main>
+
+    <footer class="page-footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </footer>
+
+    </div>
+
+
+    <!-- The Most Minimalist Javascript -->
+    <script src="../../js/the.js"></script>
+
+  </body>
+</html>

@@ -7,7 +7,21 @@
   </url>
 
   <url>
+    <loc>https://thoughtsfactorial.com/posts/2021-04-29-grounding-functions-in-simplicty/index.html</loc>
+    <lastmod>April 29, 2021</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
     <loc>https://thoughtsfactorial.com/posts/2021-04-24-working-around-errors-with-free/index.html</loc>
+    <lastmod>April 24, 2021</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://thoughtsfactorial.com/posts/2021-04-24-headers-and-servant/index.html</loc>
     <lastmod>April 24, 2021</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
