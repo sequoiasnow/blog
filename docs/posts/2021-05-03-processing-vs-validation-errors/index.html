@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thoughts! - - Processing vs. Validating Errors</title>
+    <link rel="stylesheet" href="../../css/the.css" />
+
+    <!-- FavIcon  -->
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"><link rel="shortcut icon" href="../../images/favicons/favicon32.png"><link rel="apple-touch-icon-precomposed" sizes="144x144" href="../../images/favicons/favicon144.png"><link rel="apple-touch-icon-precomposed" sizes="114x114" href="../../images/favicons/favicon114.png"><link rel="apple-touch-icon-precomposed" sizes="72x72" href="../../images/favicons/favicon72.png"><link rel="apple-touch-icon-precomposed" sizes="57x57" href="../../images/favicons/favicon57.png">
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.css" integrity="sha384-Cqd8ihRLum0CCg8rz0hYKPoLZ3uw+gES2rXQXycqnL5pgVQIflxAUDS7ZSjITLb5" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.js" integrity="sha384-1Or6BdeNQb0ezrmtGeqQHFpppNd7a/gw29xeiSikBbsb44xu3uAo8c7FwbF5jhbd" crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+  </head>
+  <body>
+    <button class="dark-mode" onClick="swapDarkLight();">
+      Dark Mode
+    </button>
+    <div class="wrapper">
+      <nav>
+        <ul>
+          <li class="nav__title">
+            <a href="../../">Thoughts<span class="factorial">!</span></a>
+          </li>
+          <li class="nav__pages">
+            <ul>
+              <li><a href="../../">Home</a></li>
+              <li><a href="../../about/">About</a></li>
+              <li><a href="../../contact/">Contact</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <main role="main" class="content">
+        <article class="post">
+  <section class="post__header">
+    <h1 class="post__title">Processing vs. Validating Errors</h1>
+  </section>
+  <section class="post__body">
+    <p>Let’s talk about how and when we generate errors. It is entirely common for the validation of incoming data to succeed, only for the later use of that data to be meet with some unforeseen difficulty later on in the program. However, since the former step is usually the only one to report errors, we are often left with inscrutable 500 responses in the second case.</p>
+<p>Now, this has two very obvious consequences: the error is made unclear to the user, and the error is logged incorrectly for debugging. The first case can be the most severe - for instance, a user facing a banking form should never be left with a 500 response, the error must <strong>always</strong> be explicit in situations where trust in the programs logic are paramount. The other angle is more subtle, but amounts to an inconsistency in program design. Data that is for some reason invalid is a client error, and should be returned as such to a client to be handled. If an error that should fall under the auspices of validation is instead reported using logging, or crash reports, on the server, it finds itself misrepresented, and what is more - prevents the client from any kind of reasonable error handling.</p>
+<p>Let’s look at an example in practice. Suppose our application is concerned with storing and presenting memos. We have a function which validates an incoming memo:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">validateMemo ::</span> <span class="dt">Memo</span> <span class="ot">-&gt;</span> m (<span class="dt">Either</span> <span class="dt">MemoErr</span> <span class="dt">Memo</span>)</span></code></pre></div>
+<p>Perhaps this checks if a memo with the same name already exists in the database, or performed some other checks for nonzero fields. We then either return the error or the validated field, let’s look at this in the context of a <a href="https://hackage.haskell.org/package/servant">Servant</a>-like handler.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">postMemo ::</span> <span class="dt">Memo</span> <span class="ot">-&gt;</span> m (<span class="dt">Entity</span> <span class="dt">Memo</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>postMemo memo <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    res <span class="ot">&lt;-</span> validateMemo</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">case</span> res <span class="kw">of</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Left</span> err <span class="ot">-&gt;</span> throwError <span class="op">$</span> error400 { errBody <span class="ot">=</span> err }</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Right</span> memo <span class="ot">-&gt;</span> runDb <span class="op">$</span> insertEntity memo</span></code></pre></div>
+<blockquote>
+<p>The Haskeller who spends to much of their time browsing through hoogle, might also spot the slightly more obvious <code>either (\ e -&gt; throwError $ error400 {errBody = e}) (runDb . inserEntity) . validateMemo</code> option, but to each their own.</p>
+</blockquote>
+<p>Now, let’s look at the flow our potential client would expect: A memo is posted, either we receive a <code>400</code> and attached <code>MemoErr</code> or a <code>200</code> response and an <code>Entity Memo</code>, indicating successful database insertion. However, what we might not expect is a blank <code>500</code> response, after all it doesn’t seem to be present in any of the above code. Not so fast however, let’s think about what it means to have a function like <code>runDb</code> in our code - it means we are accessing the outside world (You might also see this in the relevant type classes for <code>m</code> had I not been to lazy to write them). When we are accessing the outer world, we are running the risk of errors, and hence it is apparent, but not obvious, that the insertion step of the above code can in fact result in an error!</p>
+<p>Now, if that error is something unavoidable, i.e. the database is down, 500 is clearly an acceptable response. The problem here is when it’s not. Suppose our insertion statement fails because our memo violates a uniqueness constraint? In theory that would be checked by our validation request, but since the two do not take place within a transaction, there is no guarantee that a memo might be created between the two steps with an overlapping name. In that event, we hit a 500 error from an insertion that should have been returned as a validation issue! In short, we hide a validation error that emerges as we process the request.</p>
+<hr />
+<p>Now that entire example might seem a bit contrived, and it is for the purposes of demonstration, but this type of problem is ubiquitous in even the best code that touches the outside world. As soon as one point of an entry’s validation becomes dependent on an unreliable external resource, we can not guarantee that a validation of a resource remains valid.</p>
+  </section>
+</article>
+
+      </main>
+
+    <footer class="page-footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </footer>
+
+    </div>
+
+
+    <!-- The Most Minimalist Javascript -->
+    <script src="../../js/the.js"></script>
+
+  </body>
+</html>
