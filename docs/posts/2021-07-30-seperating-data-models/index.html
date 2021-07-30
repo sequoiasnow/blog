@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thoughts! - - Separating Application Logic From Data</title>
+    <link rel="stylesheet" href="../../css/the.css" />
+
+    <!-- FavIcon  -->
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"><link rel="shortcut icon" href="../../images/favicons/favicon32.png"><link rel="apple-touch-icon-precomposed" sizes="144x144" href="../../images/favicons/favicon144.png"><link rel="apple-touch-icon-precomposed" sizes="114x114" href="../../images/favicons/favicon114.png"><link rel="apple-touch-icon-precomposed" sizes="72x72" href="../../images/favicons/favicon72.png"><link rel="apple-touch-icon-precomposed" sizes="57x57" href="../../images/favicons/favicon57.png">
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.css" integrity="sha384-Cqd8ihRLum0CCg8rz0hYKPoLZ3uw+gES2rXQXycqnL5pgVQIflxAUDS7ZSjITLb5" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.js" integrity="sha384-1Or6BdeNQb0ezrmtGeqQHFpppNd7a/gw29xeiSikBbsb44xu3uAo8c7FwbF5jhbd" crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+  </head>
+  <body>
+    <button class="dark-mode" onClick="swapDarkLight();">
+      Dark Mode
+    </button>
+    <div class="wrapper">
+      <nav>
+        <ul>
+          <li class="nav__title">
+            <a href="../../">Thoughts<span class="factorial">!</span></a>
+          </li>
+          <li class="nav__pages">
+            <ul>
+              <li><a href="../../">Home</a></li>
+              <li><a href="../../about/">About</a></li>
+              <li><a href="../../contact/">Contact</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <main role="main" class="content">
+        <article class="post">
+  <section class="post__header">
+    <h1 class="post__title">Separating Application Logic From Data</h1>
+  </section>
+  <section class="post__body">
+    <p>There are many annoying issues associated with any type of incremental software development associated with maintaining continuity. The API must be in sync with any type of frontend application, any RPC calls must be of a standardized format, and most importantly, the application must have an understanding of the database schema. It is this last hurdle that I aim to address today, not to wholly remedy - but propose efforts to minimize the issue.</p>
+<hr />
+<p>At this point, some people will justifiably point to the growth of schema-less databases in the context of NoSQL and wonder if this issue is truly relevant to modern development. There are two points against this: the first, though the growth of NoSQL in industry has been astounding, it is still accounts for only a small minority of applications, second, although some NoSQL databases do not enforce a schema, the application architecture does. Even if we can change encoding on a whim for the database, it does not affect old data, and hence migration remains an issue. Indeed, the ability to change the future data format so freely can actually lead to a less consistent database as there is no immediate necessity to perform a proper migration.</p>
+<hr />
+<h2 id="automatic-migrations">Automatic Migrations</h2>
+<p>One of the most standard solutions to this issue is to run automatic migrations on each iteration of the application to modify the database appropriately. This is a common feature in most database reliant frameworks, and has the advantage of not requiring developer input to make a modification to the database. A developer can change their data storage and feel reasonably confident that their software will make the necessary changes. There are several complications associated with this however, some of which are enumerated below.</p>
+<h3 id="automatic-database-schmeas">Automatic Database Schmeas</h3>
+<p>Now, in many cases this is not an issue at all. For many projects, it’s not necessary to have fine tuned control over the database, and an inexperienced developer is certainly more likely to make a hash of it than their application framework on their first few tries. However, in the case when it <em>is</em> necessary, as often happens later in a project the inability to directly define the database can be a complication. Moreover, even in the best case scenario, one is limited by what the framework used for migrations is capable of. Invariably, this is much less than the database can do, and so accepting the generated schema immediately restricts the power of the database used. Consider the following example.</p>
+<p>Suppose that when you create a user in the database you want to send an email to a user that allows them to log in using a specific key to set a password. This process should be automatic with every user, and we can specify the logic entirely within the database.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> users(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- We can specify the use of uuid's via &quot;uuid-ossp&quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">id</span> UUID <span class="kw">PRIMARY</span> <span class="kw">KEY</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> gen_random_uuid(),</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- Note that the username is case insensitive, via &quot;citext&quot;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    username CITEXT <span class="kw">NOT</span> <span class="kw">NULL</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- We intentionally map to a @Maybe@ type to represent new users.</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">password</span> TEXT</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>);</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> password_reset_tokens(</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    token UUID <span class="kw">PRIMARY</span> <span class="kw">KEY</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> gen_random_uuid(),</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    user_id    UUID <span class="kw">REFERENCES</span> USERS <span class="kw">ON</span> <span class="kw">DELETE</span> <span class="kw">CASCADE</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>);</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">-- Generate a new token after a user has been inserted</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> <span class="kw">FUNCTION</span> new_user_token() RETURNS <span class="kw">TRIGGER</span> <span class="kw">AS</span> $$</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">BEGIN</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        <span class="kw">INSERT</span> <span class="kw">INTO</span> password_reset_tokens(user_id) <span class="kw">VALUES</span> (<span class="kw">NEW</span>.<span class="kw">id</span>);</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        <span class="kw">RETURN</span> <span class="kw">NULL</span>;</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">END</span>;</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>$$ LANGUAGE plpgsql;</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TRIGGER</span> new_user <span class="kw">AFTER</span> <span class="kw">INSERT</span> <span class="kw">ON</span> users</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="cf">FOR</span> <span class="kw">EACH</span> <span class="kw">ROW</span> EXECTURE <span class="kw">PROCEDURE</span> new_user_token();</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co">-- When we reset a user's password, we should remove their password reset token</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co">-- automatically .</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> <span class="kw">FUNCTION</span> remove_expired_tokens() <span class="kw">RETURN</span> <span class="kw">TRIGGER</span> <span class="kw">AS</span> $$</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">BEGIN</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">IF</span> (<span class="kw">NEW</span>.<span class="kw">password</span> <span class="op">=</span> <span class="kw">OLD</span>.<span class="kw">password</span>) <span class="cf">THEN</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>           <span class="kw">DELETE</span> <span class="kw">FROM</span> password_reset_tokens <span class="kw">WHERE</span> user_id <span class="op">=</span> <span class="kw">NEW</span>.<span class="kw">id</span> ;</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">END</span> <span class="cf">IF</span>;</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>        <span class="kw">RETURN</span> <span class="kw">NULL</span>;</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">ENd</span>;</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>$$ LANGUAGE plpgsql;</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TRIGGER</span> check_pass_reset <span class="kw">AFTER</span> <span class="kw">UPDATE</span> <span class="kw">ON</span> users</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="cf">FOR</span> <span class="kw">EACH</span> <span class="kw">ROW</span> EXECTURE <span class="kw">PROCEDURE</span> remove_expired_tokens();</span></code></pre></div>
+<p>Let’s look at what the above accomplishes. Not only do we get a free token every time we create a user, but if a user updates their password any and all of their old password reset tokens are invalidated. Now, writing this in the database is quite a bit more cumbersome, but it has tremendous advantages in a system’s stability and security. In this case the very structure of the data model prevents the occurrence of an accidentally immortal password reset t token (there are other loopholes, but this is only an example after all).</p>
+<p>Of course, doing this in practice requires some attention to the specific database functionality and is most certainly not suited for all applications or projects. But, in those cases where it is practical it is an enormous benefit - and the inability to mix such behavior, which is far more complicated than a standard schema, with automated migrations is a severe drawback.</p>
+<h3 id="unintentional-mistakes">Unintentional Mistakes</h3>
+<p>One of the great features of automated data migrations is the fact that they just work. Out of the box, you only need to work with your own code, and have some faith that whatever software is responsible for migrating the schema is reasonable. There is a downside to this however. Because every application deployment has the potential to result in a database alteration, there is a real risk to the application stability. This can be countered with extensive review and testing, but it means that each iteration of the application must pass the requirements of modifying the entire database - which can massively impede development.</p>
+<p>The last point is key, because any attempt to make the application responsible for <strong>accessing</strong> the database also responsible for <strong>defining</strong> it’s schema leads to this complication. It bundles the application logic with the database maintenance and ensures that maintenance of data is bundled within application maintenance. Fortunately, there is a better way.</p>
+<h2 id="separating-concerns">Separating Concerns</h2>
+<p>The difficulties arrived at in maintaining the database from within an application naturally suggests a solution: separating the database schema from the application logic. In practice this is often accomplished by the creation of an internal library which provides types and accessors for the database but does not expose any of the internal query logic.</p>
+<p>The specification of a <strong>library</strong> as our database access point is more than just a convenient delineation in most module systems, but also provides a convention for updates to the database. For instance, after a complete overhaul of the database, the previous library’s can be deprecated, and application developers will get deprecation errors. A small feature, which is backwards compatible, can advance the library and only needs incremental adoption.</p>
+<p>However, most importantly the separation allows the application developer to work with what they have from the data library and iterate without fear of causing a major failure in the database. The biggest risks of automatic migrations are avoided. Of course, there are drawbacks. Building such a dedicated database library means migrations are most likely to be manual. However, this is not as much of a hardship as it would be in a bundled application, since the actual occasions where the database needs to be modified are rather rare.</p>
+<h3 id="type-safety">Type Safety</h3>
+<p>There is another opportunity presented in the separation of concerns: that of type safety. In many applications, we tend to define a type that is intentionally obscure, <strong>except</strong> to the database:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">User.Types</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    ( <span class="dt">Username</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    , mkUsername</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    , <span class="kw">pattern</span> <span class="dt">Username</span> )</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">where</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- Our type we wish, to hide the constructor and only expose a function</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- for valid usernames</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Username</span> <span class="ot">=</span> <span class="dt">UnsafeUsername</span> <span class="dt">Text</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">deriving</span> (<span class="dt">Generic</span>, <span class="dt">ToSQL</span>, <span class="dt">FromSQL</span>) <span class="co">-- Except, we now have thrown</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>                                       <span class="co">-- away all security, since any</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>                                       <span class="co">-- Joe can construct our type</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>                                       <span class="co">-- using the SQL typeclasses.</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">-- Sometihng to pattern match against (this is a useful feature</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">-- allowing us to pattenr match on the constructor without</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">-- actually revealing it).</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="kw">pattern</span> <span class="dt">Username</span> <span class="ot">&lt;-</span> <span class="dt">UnsafeUsername</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">-- The only constructor we'd like to expose, something that makes some</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">-- guarantees about our username. Sadly, we could bypass this using</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">-- FromSQL.</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="ot">mkUsername ::</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Username</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>mkUsername <span class="ot">=</span> <span class="op">...</span></span></code></pre></div>
+<p>Although there are gains to this type safety, there is still a loophole, we can construct a Username from a raw string using the <code>FromSQL</code> class - but we can not leave this class since we must have a way of retrieving our types from the database.</p>
+<p>We can, however, circumvent this in the case of our database library, by, quite simply, not exposing the <code>FromSQL</code> class! Since all types that are stored are unique to the database library, the application developer has no ability to circumvent the type safe constructors. We are guaranteed that all <code>Username</code> types are rightly created with <code>mkUsername</code>, and furthermore we haven guaranteed that all such <code>Username</code> types used in the data library are valid.</p>
+<h1 id="tldr">TL;DR</h1>
+<p>The major drawback of automatic migrations is the entanglement of database schema with application logic. It prevents the full usage of the database while also forcing the application to take responsibility for the entirety of the projects data. The latter both impedes development speed, and when not, is severely dangerous. By separating the database accessors into a separate library, we eliminate the responsibility for the database as a concern for application development, thus allowing much faster and safer development. Moreover, we separate the implementation of our data into a different project, hence allowing more full control of the database if so desired. While this can mean more manual migrations, these are far less common since the database accessors are less likely to be modified frequently, and provide much greater stability and control.</p>
+<hr />
+<blockquote>
+<p>Thanks for reading the above rant. It is both longer and more rambling than first intended. I blame the coffee.</p>
+</blockquote>
+<pre><code>      )  (
+     (   ) )
+      ) ( (
+    _______)_
+ .-'---------|
+( C|/\/\/\/\/|
+ '-./\/\/\/\/|
+   '_________'
+    '-------'</code></pre>
+  </section>
+</article>
+
+      </main>
+
+    <footer class="page-footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </footer>
+
+    </div>
+
+
+    <!-- The Most Minimalist Javascript -->
+    <script src="../../js/the.js"></script>
+
+  </body>
+</html>
