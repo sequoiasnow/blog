@@ -52,8 +52,8 @@
 }
 
 .dark {
-  --color-theme-toggle: var(--color-white);;
-  --color-text: var(--color-white);;
+  --color-theme-toggle: var(--color-white);
+  --color-text: var(--color-white);
   --color-background: var(--color-dark);
 
   /* Old Hope */

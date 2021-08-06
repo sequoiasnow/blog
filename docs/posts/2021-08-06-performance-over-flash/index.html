@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thoughts! - - Performance Over Flash</title>
+    <link rel="stylesheet" href="../../css/the.css" />
+
+    <!-- FavIcon  -->
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"><link rel="shortcut icon" href="../../images/favicons/favicon32.png"><link rel="apple-touch-icon-precomposed" sizes="144x144" href="../../images/favicons/favicon144.png"><link rel="apple-touch-icon-precomposed" sizes="114x114" href="../../images/favicons/favicon114.png"><link rel="apple-touch-icon-precomposed" sizes="72x72" href="../../images/favicons/favicon72.png"><link rel="apple-touch-icon-precomposed" sizes="57x57" href="../../images/favicons/favicon57.png">
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.css" integrity="sha384-Cqd8ihRLum0CCg8rz0hYKPoLZ3uw+gES2rXQXycqnL5pgVQIflxAUDS7ZSjITLb5" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.js" integrity="sha384-1Or6BdeNQb0ezrmtGeqQHFpppNd7a/gw29xeiSikBbsb44xu3uAo8c7FwbF5jhbd" crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+  </head>
+  <body>
+    <button class="dark-mode" onClick="swapDarkLight();">
+      Dark Mode
+    </button>
+    <div class="wrapper">
+      <nav>
+        <ul>
+          <li class="nav__title">
+            <a href="../../">Thoughts<span class="factorial">!</span></a>
+          </li>
+          <li class="nav__pages">
+            <ul>
+              <li><a href="../../">Home</a></li>
+              <li><a href="../../about/">About</a></li>
+              <li><a href="../../contact/">Contact</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <main role="main" class="content">
+        <article class="post">
+  <section class="post__header">
+    <h1 class="post__title">Performance Over Flash</h1>
+  </section>
+  <section class="post__body">
+    <p>A consistent theme of this blog, aside from the irregular and convoluted nature of the posts, is a focus on simplicity. The notion of functionally driven development has become ever-more appealing as over the past few years <a href="https://pxlnv.com/blog/bullshit-web/">websites have seemingly gotten slower</a>. Its frustrating when you realize the extra 10 seconds it took your banking app to load were not increasing your experience, but rather loading a litany of libraries to track your activity, suggest you adds, and create animations which do nothing more than delay you actually reading the statement you were looking for. However, though the phenomena of a bloated web is something I’ve talked about before, it has largely been in the form of a rant on what to take away, things that negatively impact a users experience:</p>
+<ul>
+<li>animations (fun once, annoying twice, aggravating thrice,…)</li>
+<li>tracking</li>
+<li>targeted adds</li>
+<li>auto playing video</li>
+<li>loading the entire javascript applet to display one page</li>
+<li>etc…</li>
+</ul>
+<p>Yet the conversation thus far has been largely negative, without mention of constructive solutions, beyond stripping away the bloat. One of the things which we miss in the conversation is the possibility for <em>subtle</em> design. Although it seems to me that page bloat, and the associated inability to perform the task you visited a site to do, is the most aggravating part of the web today - the alternative, a bare, unstyled stack of forms, is not particularly appealing either. So, what aspects characterize the balance? An application or site which puts function first whilst retaining a unique style that embellishes rather than detracts.</p>
+<p>Well we have already hit upon some of the negatives, and there are more. Robert Heinlein’s Words concerning government come clearly to mind,</p>
+<blockquote>
+<p>In writing your constitution let me invite attention to the wonderful virtue of the negative! Accentuate the negative! Let your document be studded with things the government is forever forbidden to do… What I fear most are affirmative actions of sober and well-intentioned men, granting to government powers to do something that appears to need doing.</p>
+<p>– Prof. Bernardo de la Paz, <em>The Moon is a Hash Mistress</em></p>
+</blockquote>
+<p>These libertarian idea have a certain resonance in the context of user experience. There are certain qualities which a user will not enjoy no matter what, or go against the ideals of the people creating a website (such as tracking) which should be avoided no matter what. To often it becomes plausible later in a project to add a “feature” intended to solve some problem or add some functionality which contradicts one of these principles, and the price of that convenience falls to the user.</p>
+<p>Any positives that follow a declaration of things to avoid, should follow the principle of the negative, and be as minimal as possible. To paint with the thinest brush possible, and in the most gentle way possible. Consider the declaration of a font, typography is an essential part of web design, but let us not let that fact alone declare our use of such fonts. Instead, add typography minimally and only where important, is it better to increase load times for the sake of customization or have we already declared that style should not impact speed? If we are to use custom fonts, we should approach it minimally, using only one where needs the most impact and slowly building from there. A similar process exists with the inclusion of JavaScript libraries, or images, or animations, etc… In every case the idea is to selectively build up from nothing rather than start with a framework and trim it down. By expressly started with the negative we assert the principles of our design and let it grow organically within those limits.</p>
+<p>In the same way that <a href="http://www.csszengarden.com/">CSS Zen Garden</a> which years ago proved that with good markup, almost any design was possible in CSS, so too is it possible to build a beautiful yet functional design by first explicitly defining what can not interfere with functionality, and then building wildly within those constraints.</p>
+  </section>
+</article>
+
+      </main>
+
+    <footer class="page-footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </footer>
+
+    </div>
+
+
+    <!-- The Most Minimalist Javascript -->
+    <script src="../../js/the.js"></script>
+
+  </body>
+</html>
