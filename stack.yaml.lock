@@ -3,24 +3,24 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages:
-- completed:
-    hackage: hakyll-4.14.0.0@sha256:28aab547aa94202d486328aa4bbcd02ecbefc4e5d42dfa15e8137b731a4f5d55,9059
-    pantry-tree:
-      size: 8272
-      sha256: b5dff3f9f3c9bc32b154d8f5b30f88fc12f88a32dd7a10ac7f16584af5059b3f
-  original:
-    hackage: hakyll-4.14.0.0
-- completed:
-    hackage: hakyll-favicon-0.1.0@sha256:79ae766d7282129c2c1a10c4264c7bad4d44cb83fb76d6242bc4545ea5c2ade4,1361
-    pantry-tree:
-      size: 375
-      sha256: c9760869d296e02b1eff9a61795a481c06a03b9f94f2db14ec0631078c88e0fc
-  original:
-    hackage: hakyll-favicon-0.1.0@sha256:79ae766d7282129c2c1a10c4264c7bad4d44cb83fb76d6242bc4545ea5c2ade4,1361
 snapshots:
-- completed:
-    size: 567037
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/17/9.yaml
+- original: lts-17.9
+  completed:
     sha256: d7d8d5106e53d1669964bd8bd2b0f88a5ad192d772f5376384b76738fd992311
-  original: lts-17.9
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/17/9.yaml
+    size: 567037
+packages:
+- original:
+    hackage: hakyll-4.14.0.0
+  completed:
+    pantry-tree:
+      sha256: b5dff3f9f3c9bc32b154d8f5b30f88fc12f88a32dd7a10ac7f16584af5059b3f
+      size: 8272
+    hackage: hakyll-4.14.0.0@sha256:28aab547aa94202d486328aa4bbcd02ecbefc4e5d42dfa15e8137b731a4f5d55,9059
+- original:
+    hackage: hakyll-favicon-0.1.0@sha256:79ae766d7282129c2c1a10c4264c7bad4d44cb83fb76d6242bc4545ea5c2ade4,1361
+  completed:
+    pantry-tree:
+      sha256: c9760869d296e02b1eff9a61795a481c06a03b9f94f2db14ec0631078c88e0fc
+      size: 375
+    hackage: hakyll-favicon-0.1.0@sha256:79ae766d7282129c2c1a10c4264c7bad4d44cb83fb76d6242bc4545ea5c2ade4,1361
