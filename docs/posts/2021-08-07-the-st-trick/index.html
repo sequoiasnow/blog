@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thoughts! - - The ST Trick</title>
+    <link rel="stylesheet" href="../../css/the.css" />
+
+    <!-- FavIcon  -->
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"><link rel="shortcut icon" href="../../images/favicons/favicon32.png"><link rel="apple-touch-icon-precomposed" sizes="144x144" href="../../images/favicons/favicon144.png"><link rel="apple-touch-icon-precomposed" sizes="114x114" href="../../images/favicons/favicon114.png"><link rel="apple-touch-icon-precomposed" sizes="72x72" href="../../images/favicons/favicon72.png"><link rel="apple-touch-icon-precomposed" sizes="57x57" href="../../images/favicons/favicon57.png">
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.css" integrity="sha384-Cqd8ihRLum0CCg8rz0hYKPoLZ3uw+gES2rXQXycqnL5pgVQIflxAUDS7ZSjITLb5" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.js" integrity="sha384-1Or6BdeNQb0ezrmtGeqQHFpppNd7a/gw29xeiSikBbsb44xu3uAo8c7FwbF5jhbd" crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+  </head>
+  <body>
+    <button class="dark-mode" onClick="swapDarkLight();">
+      Dark Mode
+    </button>
+    <div class="wrapper">
+      <nav>
+        <ul>
+          <li class="nav__title">
+            <a href="../../">Thoughts<span class="factorial">!</span></a>
+          </li>
+          <li class="nav__pages">
+            <ul>
+              <li><a href="../../">Home</a></li>
+              <li><a href="../../about/">About</a></li>
+              <li><a href="../../contact/">Contact</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <main role="main" class="content">
+        <article class="post">
+  <section class="post__header">
+    <h1 class="post__title">The ST Trick</h1>
+  </section>
+  <section class="post__body">
+    <p>Let’s talk a about an issue which has plaugued many programers over the years: resource management. Particularly, the possibility of a mutable resource escaping the context it was designed for, and thus being unexpectedly altered in ways and lead to unexpected errors. At its core, the problem revolves around the possibility of a mutable resource to be unexpectedly altered by another thread. Consider the following contrived example whereby we create a mutable variable and then modify it with two different threads,</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> () </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>	<span class="kw">let</span> isAdmin <span class="ot">=</span> <span class="dt">False</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>	ref <span class="ot">&lt;-</span> newIORef isAdmin</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>	</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>	<span class="co">-- start a new thread which unexpectedly changes the value </span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>	thread <span class="ot">&lt;-</span> forkIO <span class="op">$</span> modifyIORef ref <span class="fu">not</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>	</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>	<span class="co">-- ...</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>	</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>	<span class="co">-- check for permissions </span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>	hasPriviliges <span class="ot">&lt;-</span> readIORef ref </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>	<span class="kw">if</span> hasPrivileges </span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>		<span class="co">-- ... working with an unexpected wrong value</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>	</span></code></pre></div>
+<p>The above example is quite contrived, but the issue it illustrates is a real one. Mutable variables by there very nature introduce a threat of inproper and unexpected modification because they are not bound to any particular thread of execution. It is not only the possibility of multi-threaded applications that creates this problem, a variable which leaks from a specified context can be problematic. Consider a session variable which escapes from a request context, this is an immediate security error that would not be caught by the type system. Fortunately, however, there is a way!</p>
+<p>Basically the idea is to <strong>quarantine</strong> a resource within a desired context, thus assuring it can not be used nor unexpectdly altered from without. We do this by making use of the so called <a href="https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.50.3299&amp;rep=rep1&amp;type=pdf"><code>ST</code> (state transformer) trick</a>.</p>
+<p>Before introducing any trickery, let’s start by considering the idea of a state transformer. We introduce a type <code>ST s a</code> which is a state transformer indexed by <code>s</code>. That is to say, <code>ST s a</code> holds within it a state <code>a</code> that is “named” or parametrized by a type <code>s</code>. The state monad <code>ST s a</code> holds a state indexed by <code>s</code> and delivering type <code>a</code>. The simplest example would simply be a state transformer which does nothing to the state at all, but simply returns the value, we’ll call this <code>returnST :: a -&gt; ST s a</code>.</p>
+<p>Now, in order to have any type of state within the transformer, we further need to define a type of mutable varaible which can hold the state. To do this we define a type <code>STRef s a</code>. Note that <code>STRef</code> is parameterized by <code>s</code> as well, thus the state is inherently bound to the same index. We define three functions for use with <code>STRef</code>’s:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">newSTRef ::</span> a <span class="ot">-&gt;</span> <span class="dt">ST</span> s (<span class="dt">STRef</span> s a)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ot">readSTRef ::</span> <span class="dt">STRef</span> s a <span class="ot">-&gt;</span> <span class="dt">ST</span> s a </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ot">modfiySTRef ::</span> <span class="dt">STRef</span> s a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> <span class="dt">ST</span> s ()</span></code></pre></div>
+<p>In order to use these functions together we need a way to sequence together various state transformers. Rather suggestively, we’ll call this <code>bindST</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">bindST ::</span> <span class="dt">ST</span> s a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> <span class="dt">ST</span> s b) <span class="ot">-&gt;</span> <span class="dt">ST</span> s b</span></code></pre></div>
+<p>Using <code>bindST</code> we can now sequence together multiple actions, each parametrized by the type variable <code>s</code>. It’s easy to see that with <code>bindST</code> and <code>returnST</code> <code>ST s</code> can be made a monad (more details on the implementation below). It remains only to find a way to extract the computed state value from <code>ST s a</code>, we want a function that looks a little like the following:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runST ::</span> <span class="dt">ST</span> s a <span class="ot">-&gt;</span> a </span></code></pre></div>
+<p>However, we now have a problem. Using <code>runST</code> it is now possible to swap one variable from one <code>ST s</code> thread to another as follows:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> var <span class="ot">=</span> runST (newSTRef <span class="st">&quot;Hello World&quot;</span>) <span class="kw">in</span> runST (readSTRef var) </span></code></pre></div>
+<p>This is exactly the problem we were hoping to avoid! The problem lies in an examination of the type signature, let’s look again at the type signature for <code>runST</code> this time writing the qualifiers explicitly.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runST ::</span> <span class="kw">forall</span> s a<span class="op">.</span> <span class="dt">ST</span> s a <span class="ot">-&gt;</span> a </span></code></pre></div>
+<p>Hence, in the above example, our function <code>runST</code> simply reuses the qualifier <code>s</code>. In order to explicitly speperate our contexts we need to ensure that the variable <code>s</code> does not escape our state transformer. Another way of thinking about this is that each use of <code>newSTRef</code> creates a new variable determiend by <code>s</code> in the thread and we wish for <code>runST</code> to have no knowledge of any initial variables in the thread as this could cause unexpected mutation. We do this by use of something called a rigid type variable, or as it’s someone known a rigid skolem.</p>
+<h2 id="ahh-a-skolem">Ahh, a Skolem!</h2>
+<p>A skolem, a name which appears in several places in GHC compiler messages but does whose source is not quoted anywhere, is far less scary than it’s name, or the associated mathematical concept.</p>
+<blockquote>
+<p>In mathematics, quoth wikepedia, skolemization is the process of lifting existential quantifiers out of an expression and moving them before any universal quantifier. Usually this is done by introduction of a new function which depends only upon the preceding universal constants, and thus it’s existence is equiviliant. I.e. <span class="math inline">\(\forall x \exists y \forall z. Q(x,y,z)\)</span> could be changed into skolem normal form by defining a new function <span class="math inline">\(f\)</span> such that <span class="math inline">\(f(x) = y\)</span> (this keeps the dependence of <span class="math inline">\(y\)</span> on <span class="math inline">\(x\)</span>) and rewriting the expression as <span class="math inline">\(\exists f \forall x \forall z. Q(x, f(x), z)\)</span> which exists iff the original.</p>
+</blockquote>
+<p>In Haskell, it’s much easier to understand. Consider again our definition of <code>runST :: ST s a -&gt; a</code>, enabling <code>ExistentialQuantifiers</code> we have this explicitly as <code>runST :: forall s a. ST s a -&gt; a</code>. The <strong>trick</strong> part of the ST trick, is to change the order of quantification by writing <code>runST</code> as</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">runST ::</span> <span class="kw">forall</span> a<span class="op">.</span> (<span class="kw">forall</span> s<span class="op">.</span> <span class="dt">ST</span> s a) <span class="ot">-&gt;</span> a</span></code></pre></div>
+<blockquote>
+<p>This is what’s known as a <code>Rank2Type</code> in Haskell, refering to the nested forall, and requires the <code>RankNTypes</code> extension.</p>
+</blockquote>
+<p>What’s going on here? Well, we are stating that <code>runST</code> must work for any <code>s</code> no matter the type. Because we explitly say that we accept any <code>s</code> for our type parameter, it can’t leak. Let’s look at that example which broke our quarantine origionally.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> var <span class="ot">=</span> runST (newSTRef <span class="st">&quot;Hello World&quot;</span>) <span class="kw">in</span> runST (readSTRef var) </span></code></pre></div>
+<p>If we look at the type of <code>var</code> we can see that it’s actually introduced two type variables!</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>runST (newSTRef <span class="st">&quot;Hello World&quot;</span>)<span class="ot"> ::</span> (<span class="kw">forall</span> s<span class="op">.</span> <span class="dt">ST</span> s (<span class="dt">STRef</span> s' <span class="dt">String</span>)) <span class="ot">-&gt;</span> <span class="dt">STRef</span> s' <span class="dt">String</span> </span></code></pre></div>
+<p>But this doesn’t make any sense, there is no instance of <code>runST</code> that can be applied to <code>var</code> since the argument type doesn’t match the <em>any</em> type of <code>s</code>. Indeed, GHC will complain if we attempt to run the above:</p>
+<pre><code>*Main&gt; let var = runST (newSTRef &quot;Hello World&quot;) in runST (readSTRef var) 
+
+&lt;interactive&gt;:3:18: error:
+    • Couldn't match type ‘a1’ with ‘STRef s [Char]’
+        because type variable ‘s’ would escape its scope
+      This (rigid, skolem) type variable is bound by
+        a type expected by the context:
+          forall s. ST s a1
+        at &lt;interactive&gt;:3:17-40
+      Expected type: ST s a1
+        Actual type: ST s (STRef s [Char])
+    • In the first argument of ‘runST’, namely
+        ‘(newSTRef &quot;Hello World&quot;)’
+      In the expression: runST (newSTRef &quot;Hello World&quot;)
+      In an equation for ‘var’: var = runST (newSTRef &quot;Hello World&quot;)
+    • Relevant bindings include var :: a1 (bound at &lt;interactive&gt;:3:5)</code></pre>
+<p>What’s preventing our <code>STRef</code> from escaping the context is of course the fact that <code>s</code> would no longer be contianed within the existential qualification. However, we can still use <code>ST</code> as normal, for instance, if we create a reference and then read it again we run into no issues, since the type we are returning is not bound to <code>s</code>.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>runST <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>	var <span class="ot">&lt;-</span> newSTRef <span class="st">&quot;Hello World&quot;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>	modifySTRef var <span class="op">$</span> <span class="fu">flip</span> (<span class="op">&lt;&gt;</span>) <span class="st">&quot;!&quot;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>	readSTRef var</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>	</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- &quot;Hello World!&quot;</span></span></code></pre></div>
+<p>There are <a href="https://wiki.haskell.org/Monad/ST">many other examples</a> about how the trick allows using mutable logic in ways that a functional program would typically allow, <strong>without</strong> sacrificing type safety. However, to me the most impressive part of the <code>ST</code> trick is the fact that it isn’t built out compiler level trickery, but rather entirely made possible by the Haskell type system. Moreover if we look a little more into the initial paper on the subject we see a rather interesting definition, one that is quite similar to GHC’s own:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> <span class="dt">IO</span> a <span class="ot">=</span> <span class="dt">ST</span> <span class="dt">RealWorld</span> a</span></code></pre></div>
+<hr />
+<h3 id="an-example">An Example</h3>
+<p>This is adapted from Sandy Magurie’s <em>Thinking With Types</em> which is an excellent book about higher order type level programming in Haskell. Note the use of <code>unsafePerformIO</code> in our implementation is not exposed, and hence can not lead to type errors (it is possible to rework the example without such reliance on )</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE ExistentialQuantification #-}</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ot">{-# LANGUAGE RankNTypes                #-}</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">Lib</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  ( <span class="dt">ST</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  , runST</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  , <span class="dt">STRef</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  , newSTRef</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  , writeSTRef</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  , readSTRef</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  , modifySTRef )</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="kw">where</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span>           <span class="dt">Data.IORef</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span>           <span class="dt">GHC.IO</span>     (unsafePerformIO)</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">ST</span> s a <span class="ot">=</span> <span class="dt">ST</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  {<span class="ot"> unsafeRunST ::</span> a <span class="co">-- not exposed, but used under the hood</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="co">-- actual execution, note the only difference from @unsafeRunST@ is the</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="co">-- universal qualifier indicating /any/ s.</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="ot">runST ::</span> (<span class="kw">forall</span> s<span class="op">.</span> <span class="dt">ST</span> s a) <span class="ot">-&gt;</span> a</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>runST <span class="ot">=</span> unsafeRunST</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="co">-- instances</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> (<span class="dt">ST</span> s) <span class="kw">where</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmap</span> f (<span class="dt">ST</span> a) <span class="ot">=</span> <span class="fu">seq</span> a <span class="op">.</span> <span class="dt">ST</span> <span class="op">$</span> f a</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Applicative</span> (<span class="dt">ST</span> s) <span class="kw">where</span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pure</span> <span class="ot">=</span> <span class="dt">ST</span></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>  (<span class="dt">ST</span> f) <span class="op">&lt;*&gt;</span> (<span class="dt">ST</span> a) <span class="ot">=</span> <span class="fu">seq</span> a <span class="op">.</span> <span class="dt">ST</span> <span class="op">$</span> f a</span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monad</span> (<span class="dt">ST</span> s) <span class="kw">where</span></span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>  (<span class="dt">ST</span> a) <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> <span class="fu">seq</span> a <span class="op">$</span> f a</span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a><span class="co">-- working with st ref's</span></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">STRef</span> s a <span class="ot">=</span> <span class="dt">STRef</span></span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>  {<span class="ot"> unSTRef ::</span> <span class="dt">IORef</span> a }</span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a><span class="ot">newSTRef ::</span> a <span class="ot">-&gt;</span> <span class="dt">ST</span> s (<span class="dt">STRef</span> s a)</span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a>newSTRef <span class="ot">=</span> <span class="fu">pure</span> <span class="op">.</span> <span class="dt">STRef</span> <span class="op">.</span> unsafePerformIO <span class="op">.</span> newIORef</span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a><span class="ot">readSTRef ::</span> <span class="dt">STRef</span> s a <span class="ot">-&gt;</span> <span class="dt">ST</span> s a</span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a>readSTRef <span class="ot">=</span> <span class="fu">pure</span> <span class="op">.</span> unsafePerformIO <span class="op">.</span> readIORef <span class="op">.</span> unSTRef</span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a><span class="ot">writeSTRef ::</span> <span class="dt">STRef</span> s a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">ST</span> s ()</span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a>writeSTRef ref <span class="ot">=</span> <span class="fu">pure</span> <span class="op">.</span> unsafePerformIO <span class="op">.</span> writeIORef (unSTRef ref)</span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a><span class="ot">modifySTRef ::</span> <span class="dt">STRef</span> s a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> <span class="dt">ST</span> s ()</span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a>modifySTRef ref f <span class="ot">=</span> readSTRef ref <span class="op">&gt;&gt;=</span> (writeSTRef ref <span class="op">.</span> f)</span></code></pre></div>
+<pre class="haske"><code>newtype STRef a = STRef (IORef a )</code></pre>
+  </section>
+</article>
+
+      </main>
+
+    <footer class="page-footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </footer>
+
+    </div>
+
+
+    <!-- The Most Minimalist Javascript -->
+    <script src="../../js/the.js"></script>
+
+  </body>
+</html>

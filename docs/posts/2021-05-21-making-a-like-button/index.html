@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thoughts! - - Building a Like Button</title>
+    <link rel="stylesheet" href="../../css/the.css" />
+
+    <!-- FavIcon  -->
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"><link rel="shortcut icon" href="../../images/favicons/favicon32.png"><link rel="apple-touch-icon-precomposed" sizes="144x144" href="../../images/favicons/favicon144.png"><link rel="apple-touch-icon-precomposed" sizes="114x114" href="../../images/favicons/favicon114.png"><link rel="apple-touch-icon-precomposed" sizes="72x72" href="../../images/favicons/favicon72.png"><link rel="apple-touch-icon-precomposed" sizes="57x57" href="../../images/favicons/favicon57.png">
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.css" integrity="sha384-Cqd8ihRLum0CCg8rz0hYKPoLZ3uw+gES2rXQXycqnL5pgVQIflxAUDS7ZSjITLb5" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.js" integrity="sha384-1Or6BdeNQb0ezrmtGeqQHFpppNd7a/gw29xeiSikBbsb44xu3uAo8c7FwbF5jhbd" crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+  </head>
+  <body>
+    <button class="dark-mode" onClick="swapDarkLight();">
+      Dark Mode
+    </button>
+    <div class="wrapper">
+      <nav>
+        <ul>
+          <li class="nav__title">
+            <a href="../../">Thoughts<span class="factorial">!</span></a>
+          </li>
+          <li class="nav__pages">
+            <ul>
+              <li><a href="../../">Home</a></li>
+              <li><a href="../../about/">About</a></li>
+              <li><a href="../../contact/">Contact</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <main role="main" class="content">
+        <article class="post">
+  <section class="post__header">
+    <h1 class="post__title">Building a Like Button</h1>
+  </section>
+  <section class="post__body">
+    <p>Let’s look at a very simple exercise: adding a like button to a site, such as this one. How would we go about it? It’s not as easy a question to answer as we might assume. Here’s the thinking:</p>
+<p>Frist, we need to associate our blog post with it’s number of likes, say we have some type <code>Post</code>, we need define something like <code>type Post' = (Post, Int)</code> which associates the number of likes with our post. Then we can add a button somewhere on our site, to submit a <code>like</code> request. This might look like</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;form</span> <span class="er">method</span><span class="ot">=</span><span class="st">&quot;post&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;button</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;like&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>        <span class="kw">&lt;span</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;icon&quot;</span><span class="kw">&gt;</span><span class="dv">&amp;#9829;</span><span class="kw">&lt;/span&gt;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="kw">&lt;span</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;icon-sub&quot;</span><span class="kw">&gt;</span>{{likes}}<span class="kw">&lt;/span&gt;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&lt;/button&gt;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;/form&gt;</span></span></code></pre></div>
+<p>Here we display a heart icon with the number of likes and the entirety of the thing is a form. Our handler can then work to update our entry in the database. (In this example let’s use the small web framework <a href="spock.li">Spock</a>).</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">server ::</span> <span class="dt">Spock</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>server <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    getPost (<span class="st">&quot;post&quot;</span> <span class="op">&lt;//&gt;</span> var) <span class="op">$</span> \ postName <span class="ot">-&gt;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- assuming we have some database method to get a post</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        post <span class="ot">&lt;-</span> runDb <span class="op">$</span> DB.getBy <span class="op">$</span> <span class="dt">UniquePostName</span> postName</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- and using some generic function to render a post as html</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        renderPostPage post</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    post (<span class="st">&quot;post&quot;</span> <span class="op">&lt;//&gt;</span> var) <span class="op">$</span> \ postName <span class="ot">-&gt;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- pseudode for database update</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        newPost <span class="ot">&lt;-</span> runDb <span class="op">$</span> DB.update</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>          (\ p <span class="ot">-&gt;</span> p <span class="op">^.</span> <span class="dt">PostName</span>  <span class="op">==.</span> val postName)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>          (\ p <span class="ot">-&gt;</span> p { postLikes <span class="ot">=</span> <span class="dv">1</span> <span class="op">+</span> postLikes p })</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- return rendered page</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        renderPostPage newPost</span></code></pre></div>
+<blockquote>
+<p>The above code uses a form for ease of use, but it’s easy to see how the exact same code would be appropriate for use with a JSON api.</p>
+</blockquote>
+<p>It’s a pretty simple setup, although we’ve fudged some of the code’s details. Still the idea is simple, and we pat ourselves on the back and call it a job well done. Well… not quite. There are a few pretty obvious failures, the most prominent one being, there’s no way to ensure the same person won’t spam that like button. It’d be easy enough for some nefarious actor, or disgruntled post author, to spam that like button. What can we do to prevent this?</p>
+<p>Well the first idea is simply to limit liking to logged in users, if it’s a site that permits logged in users that is. But that second point hits on a problem, there are a lot of sites which serve up public content without any facility for logging in, like this one. Moreover, even when such an administration system does exist it doesn’t mean you’d want to restrict the ability to comment to that.</p>
+<p>So we have to come up with a way to make sure someone reading an article can only like it once, and before going any further let’s bring the ax down on one concept: fingerprinting. In general it’s not a particularly ethical or democratic thing to track someone without their permission. Furthermore, computers doing things without explicit user interaction can often lead to more confusing than leaving a few steps to a human to make explicit what’s going on. Our solution then, shouldn’t rely on weird underground trickery in attempting to pin our users down, instead we should think about what we can ask them to limit their multiple likes.</p>
+  </section>
+</article>
+
+      </main>
+
+    <footer class="page-footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </footer>
+
+    </div>
+
+
+    <!-- The Most Minimalist Javascript -->
+    <script src="../../js/the.js"></script>
+
+  </body>
+</html>
