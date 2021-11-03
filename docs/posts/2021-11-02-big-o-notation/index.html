@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thoughts! - - A Small Note on Big O Notation</title>
+    <link rel="stylesheet" href="../../css/the.css" />
+
+    <!-- FavIcon  -->
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"><link rel="shortcut icon" href="../../images/favicons/favicon32.png"><link rel="apple-touch-icon-precomposed" sizes="144x144" href="../../images/favicons/favicon144.png"><link rel="apple-touch-icon-precomposed" sizes="114x114" href="../../images/favicons/favicon114.png"><link rel="apple-touch-icon-precomposed" sizes="72x72" href="../../images/favicons/favicon72.png"><link rel="apple-touch-icon-precomposed" sizes="57x57" href="../../images/favicons/favicon57.png">
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.css" integrity="sha384-Cqd8ihRLum0CCg8rz0hYKPoLZ3uw+gES2rXQXycqnL5pgVQIflxAUDS7ZSjITLb5" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.js" integrity="sha384-1Or6BdeNQb0ezrmtGeqQHFpppNd7a/gw29xeiSikBbsb44xu3uAo8c7FwbF5jhbd" crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+  </head>
+  <body>
+    <button class="dark-mode" onClick="swapDarkLight();">
+      Dark Mode
+    </button>
+    <div class="wrapper">
+      <nav>
+        <ul>
+          <li class="nav__title">
+            <a href="../../">Thoughts<span class="factorial">!</span></a>
+          </li>
+          <li class="nav__pages">
+            <ul>
+              <li><a href="../../">Home</a></li>
+              <li><a href="../../about/">About</a></li>
+              <li><a href="../../contact/">Contact</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <main role="main" class="content">
+        <article class="post">
+  <section class="post__header">
+    <h1 class="post__title">A Small Note on Big O Notation</h1>
+  </section>
+  <section class="post__body">
+    <p>Big O notation is ubiquitous in programming, or at least that’s the impression anyone in an introductory CS class would get. However, the truth of the matter is that for developers involved more in the creation of code than the development of higher theory it rarely occurs except in extreme edge cases concerning performance. The reason for this is simple, in that most developers make the correct choice to use existing and proven algorithms rather than developing their own, likely less performant, and certainly less maintainable, versions.</p>
+<p>Still, rare as it is, at times it can be useful to recall the definition, and this post aims to serve as that reminder. Let us begin in mathematics where O notation was originally developed for the purposes of analysis. The definition reads as follows.</p>
+<p>Suppose <span class="math inline">\(f(x)\)</span> and <span class="math inline">\(g(x)\)</span> are real functions, such that <span class="math inline">\(g(x)\)</span> is nonzero about <span class="math inline">\(a \in \R\)</span> and</p>
+<p><span class="math display">\[
+\limsup_{x \to a} \frac{|f(x)|}{|g(x)|} &lt; \infty
+\]</span></p>
+<p>then we say that <span class="math inline">\(f(x) = O(g(x)) where x \to a\)</span>.</p>
+<blockquote>
+<p>The above definition extends logically to other Metric Spaces.</p>
+</blockquote>
+<p>The use of this notation is prevalent in the series expansion of functions where big O notation indicates the severity of the error term. Writing</p>
+<p><span class="math display">\[
+\sin(x) = x + O(x^3), \qquad x \to 0
+\]</span></p>
+<p>makes it clear that errors in the above approximation will be less than the order of <span class="math inline">\(x^3\)</span>.</p>
+<p>In the case of programming we can pair this down somewhat. Namely, since we are using O notation to give an indication of how many computations are performed for an algorithm given an input, we know several things. First our functions are discrete, and since computation cost can only count up, they are positive. Moreover, since we are considering the growth of performance under repeated calls, we take <span class="math inline">\(x \to \infty\)</span> by default. (Moreover since <span class="math inline">\(x\)</span> is discrete we adopt the standard notation for when <span class="math inline">\(x\)</span> is a natural number and name it <span class="math inline">\(n\)</span>). In this context we can reduce the above definition to the following, by recalling the definition of a limit.</p>
+<p>We say <span class="math inline">\(f(x) = O(g(x))\)</span> iff there exists some <span class="math inline">\(N, C \in \mathbb{R}_+\)</span> such that for all <span class="math inline">\(x &gt; N\)</span>,</p>
+<p><span class="math display">\[
+f(x) \leq Cg(x), \qquad \forall x &gt; N.
+\]</span></p>
+<p>Applying this let’s look at a few examples in code. A function which is simply a sequence of statements, takes the sum of those statements, hence in O notation, we care only about the statement with the maximum complexity, since all others will grow slower than that. Consider the case of loops, in a program which executes</p>
+<pre><code>for I in 1..N do
+    for J in 1..M do
+        simple computation
+    end
+end</code></pre>
+<p>we can see that the time complexity of the outer loop is <span class="math inline">\(O(N *\)</span> complexity of inner loop<span class="math inline">\()\)</span>. And the complexity of the inner loop is <span class="math inline">\(O(M)\)</span> so the total is <span class="math inline">\(O(NM)\)</span>.</p>
+<p>A more complex example might be binary search (which hunts down the position of x in a sorted array of length n):</p>
+<pre><code>function binary_search(array, n, x) do
+    L = 0
+    R = n - 1
+    while L &lt;= R do
+        MID = floor( (L + R) / 2)
+        if A[MID] &lt; x do
+           L = MID + 1
+        else if A[MID] &gt; x do
+            R = MID
+        else
+            return A[MID]
+        end
+    end
+end</code></pre>
+<p>Let’s look at the complexity of the function. Assuming the worst case scenario (i.e. we only find the element at the last stage, where our array is of length 1) we see that during the first step the array is of length <span class="math inline">\(n\)</span>, at the second <span class="math inline">\(n/2\)</span>, the fourth <span class="math inline">\(n/4\)</span>, etc… Since the algorithm continues iterating until there is one element, in this assumed worst case, the number of steps is then <span class="math inline">\(k\)</span> where</p>
+<p><span class="math display">\[
+\frac{n}{2^k} \leq 1
+\]</span></p>
+<p>If we simplify using <span class="math inline">\(\log_2\)</span> we find that</p>
+<p><span class="math display">\[
+n \leq 2^k  \\
+\log_2(n) \leq k
+\]</span></p>
+<p>Hence the complexity is at most</p>
+<p><span class="math display">\[ \lfloor \log_2(n) + 1 \rfloor \]</span></p>
+<p>(here we get rid of the <span class="math inline">\(\leq\)</span> through flooring and adding one).</p>
+<hr />
+<p>There are other examples of a similar vein, but this type of analysis alone is enough to give good indication of both the theory and the calculation, at least for a quick refresher.</p>
+  </section>
+</article>
+
+      </main>
+
+    <footer class="page-footer">
+      Site proudly generated by
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </footer>
+
+    </div>
+
+
+    <!-- The Most Minimalist Javascript -->
+    <script src="../../js/the.js"></script>
+
+  </body>
+</html>
